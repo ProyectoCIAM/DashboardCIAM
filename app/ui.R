@@ -32,7 +32,10 @@ body <- dashboardBody(
    tabItems(
      tabItem("contacto", h2("Medios de contacto")),
      tabItem("canalizacion", h2("Canalización anterior a otra instancia")),
-     tabItem("instancias", h2("Calificaciones por instancia")),
+     tabItem("instancias", h2("Calificaciones por instancia"),
+      mainPanel(
+        plotlyOutput("calificacionesxinstancia")
+        )),
      tabItem("violencia", h2("Tipos de violencia experimentada")),
      tabItem("vactuales", h2("Tipos de violenccia actuales")),
      tabItem("demograficos", h2("Datos demográficos")),
