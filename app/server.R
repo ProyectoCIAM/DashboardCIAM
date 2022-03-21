@@ -8,7 +8,7 @@ library(httr)
     
 
 server <- function(input, output, session) {
-    #base_url <- "http://127.0.0.1:8080/api/"
+    base_url <- "http://127.0.0.1:8080/api/"
     #infor_url <- "folio"
     #full_url <- base::paste0(base_url, infor_url)
     #api_call <- httr::GET(full_url) 
@@ -28,25 +28,26 @@ server <- function(input, output, session) {
 
     # D1 p3
     # traemos la informacion
-    canalizacion_seguimiento_json <- jsonlite::fromJSON("http://127.0.0.1:8080/api/canalizacion_seguimiento")
-    instancia_json <- jsonlite::fromJSON("http://127.0.0.1:8080/api/instancia")
+    full_url <- base::paste0(base_url, "canalizacion_seguimiento")
+    canalizacion_seguimiento_json <- jsonlite::fromJSON(full_url)
+
+    full_url <- base::paste0(base_url, "instancia")
+    instancia_json <- jsonlite::fromJSON(full_url)
 
     # separamos el dataframe
     canalizacion_seguimiento <- canalizacion_seguimiento_json$response
-    # este es el catalogo de instancias
     instancia <- instancia_json$response
 
-    # seleccionamos las columnas de interes
-    calificacionxinstancia <- data.frame("id_canalizacion_seguimiento"=canalizacion_seguimiento$id_canalizacion_seguimiento,
-                                        "calificacion"=canalizacion_seguimiento$calificacion,
-                                        "id_instancia"=canalizacion_seguimiento$instancia)
-
-    # hacemos el merge a traves de id_instancia
-    calificacionxinstancia <- merge(calificacionxinstancia,instancia)
-
-    # creamos histograma
     output$calificacionesxinstancia <- renderPlotly({
-        ggplotly(ggplot(calificacionxinstancia, aes(x=calificacion, fill=nombre)) +
+        colnames(canalizacion_seguimiento)[17] <- "id_instancia"
+        # seleccionamos las columnas de interes
+        califxinstancia <- canalizacion_seguimiento %>%
+        select("id_canalizacion_seguimiento", "calificacion", "id_instancia")
+        colnames(instancia)[2] <- "instancia"
+        # hacemos el merge a traves de id_instancia
+        califxinstancia <- merge(califxinstancia, instancia)
+        # graficamos
+        ggplotly(ggplot(califxinstancia, aes(x = calificacion, fill = instancia)) +
             geom_bar())
     })
 }
