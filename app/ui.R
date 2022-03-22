@@ -31,7 +31,21 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
    tabItems(
-     tabItem("contacto", h2("Medios de contacto")),
+     tabItem("contacto", h2("Medios de contacto"),  
+      fluidRow(
+      box(
+        title = "Medio de Contacto", width = 6, solidHeader = TRUE,
+        plotOutput("contacto")
+      ),
+      box(
+        title = "¿La persona que contacta es quien requiere el servicio?", width = 6, solidHeader = TRUE,
+        "Box content"
+      ),
+      box(
+        title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 12, solidHeader = TRUE,
+        plotOutput("serv_acomp_emocional")
+      )
+    ),),
      tabItem("canalizacion", h2("Canalización anterior a otra instancia")),
      tabItem("instancias", h2("Calificaciones por instancia"),
       mainPanel(
