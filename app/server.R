@@ -77,14 +77,26 @@ server <- function(input, output, session) {
     ###     ¿La persona que contacta es quien requiere el servicio?    ###
 
 
+    ## this question also uses folios table
+
+    #counting id's from folios' column id_contacto_catalogo
+
+    persona_requiere_servicio_count <- sum(ifelse(folios$filtro_si == "1",1,0))  ### no esta regresando nada, pero debería regresar 19
+
+    persona_otra_requiere_servicio_count <- sum(ifelse(folios$filtro_no == "1",1,0))  ### no esta regresando nada, pero debería regresar 17
 
 
+    persona_solicita_servicio <- data.frame(category = c("Si", "No"), value = c(19, 17))
 
 
+    output$persona_servicio <- renderPlotly({ggplotly(
+        ggplot(persona_solicita_servicio, aes(x=category, y=value, fill = category)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 60, hjust=1)) +
+            xlab("Categoría") +
+            ylab("Frecuencia"))
 
-
-
-
+    })
 
 
 
@@ -123,11 +135,13 @@ server <- function(input, output, session) {
     )
 
 
-    output$serv_acomp_emocional <- renderPlot({
-       ggplot(servicio_acomp_emocional_data, aes(x=category, y=value)) + 
-       geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) + 
-       xlab("Categoría") +
-       ylab("Frecuencia")
+    output$serv_acomp_emocional <- renderPlotly({
+       ggplotly(
+           ggplot(servicio_acomp_emocional_data, aes(x=category, y=value, fill = category)) + 
+            geom_bar(stat="identity", alpha=.6, width=.4) + 
+            theme(axis.text.x = element_text(angle = 60, hjust=1)) +
+            xlab("Categoría") +
+            ylab("Frecuencia"))
     })
 
 

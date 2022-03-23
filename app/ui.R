@@ -39,11 +39,11 @@ body <- dashboardBody(
       ),
       box(
         title = "¿La persona que contacta es quien requiere el servicio?", width = 6, solidHeader = TRUE,
-        "Box content"
+        plotlyOutput("persona_servicio")
       ),
       box(
         title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 12, solidHeader = TRUE,
-        plotOutput("serv_acomp_emocional")
+        plotlyOutput("serv_acomp_emocional")
       )
     ),),
      tabItem("canalizacion", h2("Canalización anterior a otra instancia")),
