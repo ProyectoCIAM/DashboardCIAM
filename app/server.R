@@ -9,6 +9,7 @@ library(httr)
 
 server <- function(input, output, session) {
     # llamada tablas
+    # base_url <- "http://127.0.0.1:8000/api/" # url raiz
     base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
@@ -125,28 +126,103 @@ server <- function(input, output, session) {
 
 
     ########################        DASHBOARD 1  PART 2
+    output$canalizacionxAnterior <- renderPlotly({
+        canalizacion_anterior_si_count <- sum(!is.na(canalizacion_seguimiento$siCanalizacion))
+        canalizacion_anterior_no_count <- sum(!is.na(canalizacion_seguimiento$noCanalizacion))
 
+        respuestas_anterior <- data.frame(Anterior = c("Si", "No"), value = c(canalizacion_anterior_si_count, canalizacion_anterior_no_count))
 
+        ggplotly(
+        ggplot(respuestas_anterior, aes(x=Anterior, y=value, fill = Anterior)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxSeguimiento <- renderPlotly({
+        canalizacion_Seguimiento_si_count <- sum(!is.na(canalizacion_seguimiento$siSeguimiento))
+        canalizacion_Seguimiento_no_count <- sum(!is.na(canalizacion_seguimiento$noSeguimiento))
 
+        respuestas_Seguimiento <- data.frame(Seguimiento = c("Si", "No"), value = c(canalizacion_Seguimiento_si_count, canalizacion_Seguimiento_no_count))
 
+        ggplotly(
+        ggplot(respuestas_Seguimiento, aes(x=Seguimiento, y=value, fill = Seguimiento)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxAdecuado <- renderPlotly({
+        canalizacion_Adecuado_si_count <- sum(!is.na(canalizacion_seguimiento$siAdecuado))
+        canalizacion_Adecuado_no_count <- sum(!is.na(canalizacion_seguimiento$noAdecuado))
 
+        respuestas_Adecuado <- data.frame(Adecuado = c("Si", "No"), value = c(canalizacion_Adecuado_si_count, canalizacion_Adecuado_no_count))
 
+        ggplotly(
+        ggplot(respuestas_Adecuado, aes(x=Adecuado, y=value, fill = Adecuado)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxOportuno <- renderPlotly({
+        canalizacion_Oportuno_si_count <- sum(!is.na(canalizacion_seguimiento$siOportuno))
+        canalizacion_Oportuno_no_count <- sum(!is.na(canalizacion_seguimiento$noOportuno))
 
+        respuestas_Oportuno <- data.frame(Oportuno = c("Si", "No"), value = c(canalizacion_Oportuno_si_count, canalizacion_Oportuno_no_count))
 
+        ggplotly(
+        ggplot(respuestas_Oportuno, aes(x=Oportuno, y=value, fill = Oportuno)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxProntitud <- renderPlotly({
+        canalizacion_Prontitud_si_count <- sum(!is.na(canalizacion_seguimiento$siProntitud))
+        canalizacion_Prontitud_no_count <- sum(!is.na(canalizacion_seguimiento$noProntitud))
 
+        respuestas_Prontitud <- data.frame(Prontitud = c("Si", "No"), value = c(canalizacion_Prontitud_si_count, canalizacion_Prontitud_no_count))
 
+        ggplotly(
+        ggplot(respuestas_Prontitud, aes(x=Prontitud, y=value, fill = Prontitud)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxConfianza <- renderPlotly({
+        canalizacion_Confianza_si_count <- sum(!is.na(canalizacion_seguimiento$siConfianza))
+        canalizacion_Confianza_no_count <- sum(!is.na(canalizacion_seguimiento$noConfianza))
 
+        respuestas_Confianza <- data.frame(Confianza = c("Si", "No"), value = c(canalizacion_Confianza_si_count, canalizacion_Confianza_no_count))
 
+        ggplotly(
+        ggplot(respuestas_Confianza, aes(x=Confianza, y=value, fill = Confianza)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
+    output$canalizacionxRespeto <- renderPlotly({
+        canalizacion_Respeto_si_count <- sum(!is.na(canalizacion_seguimiento$siRespeto))
+        canalizacion_Respeto_no_count <- sum(!is.na(canalizacion_seguimiento$noRespeto))
 
+        respuestas_Respeto <- data.frame(Respeto = c("Si", "No"), value = c(canalizacion_Respeto_si_count, canalizacion_Respeto_no_count))
 
-
-
+        ggplotly(
+        ggplot(respuestas_Respeto, aes(x=Respeto, y=value, fill = Respeto)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
 
 
