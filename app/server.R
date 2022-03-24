@@ -164,4 +164,4 @@ server <- function(input, output, session) {
         ggplotly(ggplot(califxinstancia, aes(x = calificacion, fill = instancia)) +
             geom_bar())
     })
-}
+ }
