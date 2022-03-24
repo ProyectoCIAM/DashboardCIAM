@@ -30,23 +30,55 @@ sidebar <- dashboardSidebar(
    
 
 body <- dashboardBody(
-   tabItems(
-     tabItem("contacto", h2("Medios de contacto"),  
+  tabItems(
+    tabItem("contacto", h2("Medios de contacto"),  
       fluidRow(
-      box(
-        title = "Medio de Contacto", width = 6, solidHeader = TRUE,
-        plotOutput("contacto")
+        box(
+          title = "Medio de Contacto", width = 6, solidHeader = TRUE,
+          plotOutput("contacto")
+        ),
+        box(
+          title = "¿La persona que contacta es quien requiere el servicio?", width = 6, solidHeader = TRUE,
+          plotlyOutput("persona_servicio")
+        ),
+        box(
+          title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 12, solidHeader = TRUE,
+          plotlyOutput("serv_acomp_emocional")
+        )
       ),
-      box(
-        title = "¿La persona que contacta es quien requiere el servicio?", width = 6, solidHeader = TRUE,
-        plotlyOutput("persona_servicio")
-      ),
-      box(
-        title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 12, solidHeader = TRUE,
-        plotlyOutput("serv_acomp_emocional")
+    ),
+    tabItem("canalizacion", h2("Canalización anterior a otra instancia"),
+      fluidRow(
+        box(
+          title = "¿Ha sido canalizada/o a otras instancias con anterioridad?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxAnterior")
+        ),
+        box(
+          title = "¿Ha tenido seguimiento?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxSeguimiento")
+        ),
+        box(
+          title = "¿Considera que el medio de contacto fue el adecuado?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxAdecuado")
+        ),
+        box(
+          title = "¿Considera que el servicio fue oportuno (en el momento adecuado)?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxOportuno")
+        ),
+        box(
+          title = "¿Recibió atención con prontitud?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxProntitud")
+        ),
+        box(
+          title = "¿Se sintió en confianza y seguro durante la atención?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxConfianza")
+        ),
+        box(
+          title = "¿Sintió en todo momento que su caso fue tratado con respeto?", width = 6, solidHeader = FALSE,
+          plotlyOutput("canalizacionxRespeto")
+        )
       )
-    ),),
-     tabItem("canalizacion", h2("Canalización anterior a otra instancia")),
+    ),
      tabItem("instancias", h2("Calificaciones por instancia"),
       mainPanel(
         plotlyOutput("calificacionesxinstancia")
