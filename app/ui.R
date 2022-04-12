@@ -31,6 +31,7 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tabItems(
+    ############   TABS  DASHBOARD 1
     tabItem("contacto", h2("Medios de contacto"),  
       fluidRow(
         box(
@@ -83,10 +84,22 @@ body <- dashboardBody(
       mainPanel(
         plotlyOutput("calificacionesxinstancia")
         )),
+    ############   TABS  DASHBOARD 2
      tabItem("violencia", h2("Tipos de violencia experimentada")),
      tabItem("vactuales", h2("Tipos de violencia actuales")),
      tabItem("demograficos", h2("Datos demográficos de la víctima")),
-     tabItem("agresor", h2("Datos del agresor")),
+     tabItem("agresor", h2("Datos del agresor"),
+      fluidRow(
+        box(
+          title = "Edad del agresor", width = 6, solidHeader = TRUE,
+          plotlyOutput("edades_agresor_grf")
+        ),
+        box(),
+        box(),
+        box()
+      ),
+     ),
+    ############   TABS  DASHBOARD 3
      tabItem("instalaciones", h2("Calificación de las instalaciones")),
      tabItem("servicios", h2("Calificación de los servicios")),
      tabItem("ucanalizacion", h2("Utilidad de la canalización")),

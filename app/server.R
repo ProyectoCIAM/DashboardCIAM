@@ -19,12 +19,16 @@ server <- function(input, output, session) {
     full_url_como_se_entero_cat <- base::paste0(base_url, "como_se_entero")
     full_url_canalizacion_seguimiento <- base::paste0(base_url, "canalizacion_seguimiento")
     full_url_instancia <- base::paste0(base_url, "instancia")
+    full_url_riesgo <- base::paste0(base_url, "riesgo")
+    full_url_sexos <- base::paste0(base_url, "sexo")
 
     #api call
     api_call_folio <- httr::GET(full_url_folio)
     api_call_medio_contacto <- httr::GET(full_url_medio_contacto)
     api_call_persona <- httr::GET(full_url_persona)
     api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
+    api_call_riesgo <- httr::GET(full_url_riesgo)
+    api_call_sexos <- httr::GET(full_url_sexos)
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -33,6 +37,8 @@ server <- function(input, output, session) {
     como_se_entero_catalogo_json <- jsonlite::fromJSON(full_url_como_se_entero_cat)
     canalizacion_seguimiento_json <- jsonlite::fromJSON(full_url_canalizacion_seguimiento)
     instancia_json <- jsonlite::fromJSON(full_url_instancia)
+    riesgo_json <- jsonlite::fromJSON(full_url_riesgo)
+    sexos_json <- jsonlite::fromJSON(full_url_sexos)
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -41,6 +47,8 @@ server <- function(input, output, session) {
     como_se_entero_catalogo <- como_se_entero_catalogo_json$response
     canalizacion_seguimiento <- canalizacion_seguimiento_json$response
     instancia <- instancia_json$response
+    riesgos <- api_call_riesgo$response
+    sexos <- api_call_sexos$response
 
 
 
@@ -240,4 +248,41 @@ server <- function(input, output, session) {
         ggplotly(ggplot(califxinstancia, aes(x = calificacion, fill = instancia)) +
             geom_bar())
     })
+
+
+
+    ########################        DASHBOARD 2
+
+    ## SECTION A
+    ## SECTION B
+    ## SECTION C
+
+    ## SECTION D
+
+    ## cambio de id y renomabriemnto de columna
+    #colnames(riesgos)[4] <- "edadAgresor"
+   
+    #direccion_agresor <- riesgos %>% 
+    #select("calleAgresor", "mzaAgresor", "ltAgresor", "numAgresor","smAgresor")
+    #colnames(riesgos)[8] <- "red_apoyo_agresor"
+
+    conteo_edades_agresor <- riesgos %>% count(edadAgresor)
+
+    #conteo_sexo_agresor <- sexos_agresor %>% count(sexo_agresor)
+    #sexos_agresor <- merge(conteo_sexo_agresor, sexos_agresor_catalogo)
+
+
+    ### gráfica de edad del agresor
+    output$edades_agresor_grf <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_edades_agresor, aes(x = edadAgresor, y = n, fill = edadAgresor)) +
+            geom_bar(stat = "identity") +
+            xlab("Edad Agresor") +
+            ylab("Frecuencia"))
+    })
+
+    ### gráfica de sexo del agresor
+
+
+
  }
