@@ -85,8 +85,36 @@ body <- dashboardBody(
         plotlyOutput("calificacionesxinstancia")
         )),
     ############   TABS  DASHBOARD 2
-     tabItem("violencia", h2("Tipos de violencia experimentada")),
-     tabItem("vactuales", h2("Tipos de violencia actuales")),
+     tabItem("violencia", h2("Tipos de violencia experimentada"),
+      fluidRow(
+        box(
+          title = "Tipos de Violencia Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_anterior")
+        ),
+        box(
+          title = "Modalidad Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_anterior")
+        ),
+        box(
+          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_anterior")
+        )
+      )),
+     tabItem("vactuales", h2("Tipos de violencia actuales"),
+      fluidRow(
+        box(
+          title = "Tipos de Violencia Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_actual")
+        ),
+        box(
+          title = "Modalidad Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_actual")
+        ),
+        box(
+          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_actual")
+        )
+      )),
      tabItem("demograficos", h2("Datos demográficos de la víctima")),
      tabItem("agresor", h2("Datos del agresor"),
       fluidRow(

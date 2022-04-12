@@ -21,6 +21,8 @@ server <- function(input, output, session) {
     full_url_instancia <- base::paste0(base_url, "instancia")
     full_url_riesgo <- base::paste0(base_url, "riesgo")
     full_url_sexos <- base::paste0(base_url, "sexo")
+    full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
+    full_url_modalidad <- base::paste0(base_url, "modalidad")
 
     #api call
     api_call_folio <- httr::GET(full_url_folio)
@@ -39,6 +41,8 @@ server <- function(input, output, session) {
     instancia_json <- jsonlite::fromJSON(full_url_instancia)
     riesgo_json <- jsonlite::fromJSON(full_url_riesgo)
     sexos_json <- jsonlite::fromJSON(full_url_sexos)
+    tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
+    modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -49,6 +53,8 @@ server <- function(input, output, session) {
     instancia <- instancia_json$response
     riesgos <- riesgo_json$response
     sexos <- sexos_json$response
+    tipo_violencia <- tipo_violencia_json$response
+    modalidad <- modalidad_json$response
 
 
 
@@ -262,8 +268,102 @@ server <- function(input, output, session) {
 
     ########################        DASHBOARD 2
 
-    ## SECTION A
+    ## SECTION A 
+    # Violencia experimentada
+
+    violencia_experimentada <- personas[,c("id_folio","tipoViolenciaPersona","modalidadPersona")]
+    colnames(violencia_experimentada)[2] <- "id_tipo_violencia"
+    colnames(violencia_experimentada)[3] <- "id_modalidad"
+
+    colnames(tipo_violencia)[2] <- "tipo_violencia"
+    colnames(modalidad)[2] <- "modalidad"
+
+    tipo_violencia_experimentada <- violencia_experimentada %>% count(id_tipo_violencia)
+    modalidad_experimentada <- violencia_experimentada %>% count(id_modalidad)
+
+    tipo_violencia_experimentada <- merge(tipo_violencia_experimentada,tipo_violencia)
+    modalidad_experimentada <- merge(modalidad_experimentada,modalidad)
+
+    count_tv_vs_m <- violencia_experimentada %>% group_by(id_tipo_violencia,id_modalidad) %>%
+        summarize(n = n())
+
+    tv_vs_m <- merge(count_tv_vs_m,tipo_violencia)
+    tv_vs_m <- merge(tv_vs_m,modalidad)
+
+    # histgrama de tipos de violencia
+    output$hist_tipo_violencia_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(tipo_violencia_experimentada, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"),tooltip="text")
+    })
+
+    # histograma de modalidad
+    output$hist_modalidad_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(modalidad_experimentada, aes(x = modalidad ,y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            xlab("Modalidad") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    # histograma combinado violencia vs modalidad
+    output$hist_tipo_vs_modalidad_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(tv_vs_m, aes(x = tipo_violencia, y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
     ## SECTION B
+    # Violencia actual
+
+    violencia_actual <- riesgos[,c("id_folio","violenciaRiesgo","modalidadRiesgo")]
+    colnames(violencia_actual)[2] <- "id_tipo_violencia"
+    colnames(violencia_actual)[3] <- "id_modalidad"
+    
+    tipo_violencia_actual <- violencia_actual %>% count(id_tipo_violencia)
+    modalidad_actual <- violencia_actual %>% count(id_modalidad)
+
+    tipo_violencia_actual <- merge(tipo_violencia_actual,tipo_violencia)
+    modalidad_actual <- merge(modalidad_actual,modalidad)
+
+    count_tv_vs_m_actual <- violencia_actual %>% group_by(id_tipo_violencia,id_modalidad) %>%
+        summarize(n = n())
+
+    tv_vs_m_actual <- merge(count_tv_vs_m_actual,tipo_violencia)
+    tv_vs_m_actual <- merge(tv_vs_m_actual,modalidad)
+
+
+    # histgrama de tipos de violencia
+    output$hist_tipo_violencia_actual <- renderPlotly({
+        ggplotly(
+            ggplot(tipo_violencia_actual, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"),tooltip="text")
+    })
+
+    # histograma de modalidad
+    output$hist_modalidad_actual <- renderPlotly({
+        ggplotly(
+            ggplot(modalidad_actual, aes(x = modalidad ,y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            xlab("Modalidad") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    # histograma combinado violencia vs modalidad
+    output$hist_tipo_vs_modalidad_actual <- renderPlotly({
+        ggplotly(
+            ggplot(tv_vs_m_actual, aes(x = tipo_violencia, y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
     ## SECTION C
 
     ## SECTION D
@@ -292,14 +392,14 @@ server <- function(input, output, session) {
     })
 
     ### gráfica de sexo del agresor
-output$sexo_agresor_grf <- renderPlotly({
-    ggplotly(
-        ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
-        geom_bar(stat = "identity") + 
-        xlab("Sexo del Agresor") +
-        ylab("Frecuencia")
-    )
-})
+    output$sexo_agresor_grf <- renderPlotly({
+        ggplotly(
+            ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
+            geom_bar(stat = "identity") + 
+            xlab("Sexo del Agresor") +
+            ylab("Frecuencia")
+        )
+    })
 
 ### gráfica: ¿La dirección del agresor/a es la misma de quien solicita el servicio?
 
