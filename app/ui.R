@@ -94,9 +94,16 @@ body <- dashboardBody(
           title = "Edad del agresor", width = 6, solidHeader = TRUE,
           plotlyOutput("edades_agresor_grf")
         ),
-        box(),
-        box(),
-        box()
+        box(
+          title = "Sexo del agresor", width = 6, solidHeader = TRUE,
+          plotlyOutput("sexo_agresor_grf")
+        ),
+        box(
+          title = "La dirección del agresor es la misma que de quien solicita el servico", width = 6, solidHeader = TRUE,
+          plotlyOutput("misma_dir_agresor_victima")
+        ),
+        box(title = "¿La persona agresora cuenta con red de apoyo?", width = 6, solidHeader = TRUE,
+        plotlyOutput("red_apoyo_agresor"))
       ),
      ),
     ############   TABS  DASHBOARD 3

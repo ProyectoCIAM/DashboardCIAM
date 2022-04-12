@@ -47,8 +47,8 @@ server <- function(input, output, session) {
     como_se_entero_catalogo <- como_se_entero_catalogo_json$response
     canalizacion_seguimiento <- canalizacion_seguimiento_json$response
     instancia <- instancia_json$response
-    riesgos <- api_call_riesgo$response
-    sexos <- api_call_sexos$response
+    riesgos <- riesgo_json$response
+    sexos <- sexos_json$response
 
 
 
@@ -260,29 +260,75 @@ server <- function(input, output, session) {
     ## SECTION D
 
     ## cambio de id y renomabriemnto de columna
-    #colnames(riesgos)[4] <- "edadAgresor"
-   
-    #direccion_agresor <- riesgos %>% 
-    #select("calleAgresor", "mzaAgresor", "ltAgresor", "numAgresor","smAgresor")
-    #colnames(riesgos)[8] <- "red_apoyo_agresor"
+    colnames(riesgos)[4] <- "edad_agresor"
+    colnames(riesgos)[5] <- "id_sexo"
 
-    conteo_edades_agresor <- riesgos %>% count(edadAgresor)
+    colnames(sexos)[2] <- "sexos_agresor_catalogo"
 
-    #conteo_sexo_agresor <- sexos_agresor %>% count(sexo_agresor)
-    #sexos_agresor <- merge(conteo_sexo_agresor, sexos_agresor_catalogo)
+    ### conteo de los datos de las columnas edad_agresor y id_sexo
+    conteo_edades_agresor <- riesgos %>% count(edad_agresor)
 
+    conteo_sexos_agresor <- riesgos %>% count(id_sexo)
+
+    ### unión de las tablas riesgos y sexos por el campo id_sexo
+    sexos_agresor_data <- merge(conteo_sexos_agresor, sexos)
 
     ### gráfica de edad del agresor
     output$edades_agresor_grf <- renderPlotly({
         ggplotly(
-            ggplot(conteo_edades_agresor, aes(x = edadAgresor, y = n, fill = edadAgresor)) +
+            ggplot(conteo_edades_agresor, aes(x = edad_agresor, y = n, fill = edad_agresor)) +
             geom_bar(stat = "identity") +
             xlab("Edad Agresor") +
             ylab("Frecuencia"))
     })
 
     ### gráfica de sexo del agresor
+output$sexo_agresor_grf <- renderPlotly({
+    ggplotly(
+        ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
+        geom_bar(stat = "identity") + 
+        xlab("Sexo del Agresor") +
+        ylab("Frecuencia")
+    )
+})
+
+### gráfica: ¿La dirección del agresor/a es la misma de quien solicita el servicio?
+
+dir <- riesgos[c("siDireccionAgresor","noDireccionAgresor")]
+
+count_si_dirs <- dir %>% filter(!is.na(siDireccionAgresor)) %>% count(siDireccionAgresor)
+count_no_dirs <- dir %>% filter(!is.na(noDireccionAgresor)) %>% count(noDireccionAgresor)
+
+count_total <- data.frame("Misma_direccion" = c("Si","No"),
+                          "n" = c(count_si_dirs$n,count_no_dirs$n))
 
 
+output$misma_dir_agresor_victima <- renderPlotly({
+    ggplotly(
+        ggplot(count_total,aes(x=Misma_direccion, y=n, fill=Misma_direccion)) +
+            geom_bar(stat = "identity") +
+            xlab("Misma dirección del agresor de quien solicita el servicio") +
+            ylab("Frecuencia")
+    )
+})
+
+
+
+    ### ¿La persona agresora cuenta con una red de apoyo?
+    red_apoyo <- riesgos[c("siRedApoyo","noRedApoyo")]
+    count_si_redAp <- red_apoyo %>% filter(!is.na(siRedApoyo)) %>% count(siRedApoyo)
+    count_no_redAp <- red_apoyo %>% filter(!is.na(noRedApoyo)) %>% count(noRedApoyo)
+
+    total_red_apoyo <- data.frame("Red_apoyo" = c("Si","No"),
+                          "n" = c(count_si_redAp$n, count_no_redAp$n))
+
+    output$red_apoyo_agresor <- renderPlotly({
+        ggplotly(
+            ggplot(total_red_apoyo, aes(x=Red_apoyo, y = n, fill=Red_apoyo)) +
+            geom_bar(stat = "identity") +
+            xlab("Red apoyo agresor") +
+            ylab("frecuencia")
+        )
+    })
 
  }
