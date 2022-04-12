@@ -20,12 +20,6 @@ server <- function(input, output, session) {
     full_url_canalizacion_seguimiento <- base::paste0(base_url, "canalizacion_seguimiento")
     full_url_instancia <- base::paste0(base_url, "instancia")
 
-    #api call
-    api_call_folio <- httr::GET(full_url_folio)
-    api_call_medio_contacto <- httr::GET(full_url_medio_contacto)
-    api_call_persona <- httr::GET(full_url_persona)
-    api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
-
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
     medio_contacto_json <- jsonlite::fromJSON(full_url_medio_contacto)
@@ -236,8 +230,17 @@ server <- function(input, output, session) {
         colnames(instancia)[2] <- "instancia"
         # hacemos el merge a traves de id_instancia
         califxinstancia <- merge(califxinstancia, instancia)
+        califxinstancia$calificacion <- as.numeric(califxinstancia$calificacion)
+        
+        califpromxinstancia <- califxinstancia %>% group_by(instancia) %>%
+            summarize(promedio = round(mean(calificacion), 2)) %>%
+            arrange(desc(promedio)) %>%
+            mutate(instancia = factor(instancia, levels = instancia))
         # graficamos
-        ggplotly(ggplot(califxinstancia, aes(x = calificacion, fill = instancia)) +
-            geom_bar())
+        ggplotly(ggplot(califpromxinstancia, aes(x = instancia, y = promedio, fill = instancia)) +
+            geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Promedio: %s", instancia, promedio))) +
+            theme(axis.title.x = element_blank(),
+                axis.text.x = element_blank(),
+                axis.ticks.x = element_blank()),tooltip="text")
     })
-}
+ }
