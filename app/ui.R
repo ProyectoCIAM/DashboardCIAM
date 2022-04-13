@@ -115,7 +115,26 @@ body <- dashboardBody(
           plotlyOutput("hist_tipo_vs_modalidad_actual")
         )
       )),
-     tabItem("demograficos", h2("Datos demográficos de la víctima")),
+     tabItem("demograficos", h2("Datos demográficos de la víctima"),
+      fluidRow(
+        box(
+          title = "Personas LGBT", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxLGBT")
+        ),
+        box(
+          title = "¿Cuenta con alguna discapacidad?", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxDiscapacidad")
+        ),
+        box(
+          title = "¿Pertenece a pueblos originarios?", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxPueblos")
+        ),
+        box(
+          title = "¿Habla alguna lengua indígena?", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxLengua_Indigena")
+        )
+      )
+    ),
      tabItem("agresor", h2("Datos del agresor"),
       fluidRow(
         box(

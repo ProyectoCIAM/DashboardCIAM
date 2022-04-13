@@ -365,7 +365,62 @@ server <- function(input, output, session) {
     })
 
     ## SECTION C
+    output$personasxLGBT <- renderPlotly({
+        personas_LGBT_si <- sum(!is.na(personas$siLGBPersona))
+        personas_LGBT_no <- sum(!is.na(personas$noLGBPersona))
 
+        respuestas_LGBT <- data.frame(LGBT = c("Si", "No"), value = c(personas_LGBT_si, personas_LGBT_no))
+
+        ggplotly(
+        ggplot(respuestas_LGBT, aes(x=LGBT, y=value, fill = LGBT)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxDiscapacidad <- renderPlotly({
+        personas_Discapacidad_si <- sum(!is.na(personas$siDiscapacidadPersona))
+        personas_Discapacidad_no <- sum(!is.na(personas$noDiscapacidadPersona))
+
+        respuestas_Discapacidad <- data.frame(Discapacidad = c("Si", "No"), value = c(personas_Discapacidad_si, personas_Discapacidad_no))
+
+        ggplotly(
+        ggplot(respuestas_Discapacidad, aes(x=Discapacidad, y=value, fill = Discapacidad)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxPueblos <- renderPlotly({
+        personas_Pueblos_si <- sum(!is.na(personas$siPueblosPersona))
+        personas_Pueblos_no <- sum(!is.na(personas$noPueblosPersona))
+
+        respuestas_Pueblos <- data.frame(Pueblos = c("Si", "No"), value = c(personas_Pueblos_si, personas_Pueblos_no))
+
+        ggplotly(
+        ggplot(respuestas_Pueblos, aes(x=Pueblos, y=value, fill = Pueblos)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxLengua_Indigena <- renderPlotly({
+        personas_Lengua_Indigena_si <- sum(!is.na(personas$siLenguaIndigenaPersona))
+        personas_Lengua_Indigena_no <- sum(!is.na(personas$noLenguaIndigenaPersona))
+
+        respuestas_Lengua_Indigena <- data.frame(Lengua_Indigena = c("Si", "No"), value = c(personas_Lengua_Indigena_si, personas_Lengua_Indigena_no))
+
+        ggplotly(
+        ggplot(respuestas_Lengua_Indigena, aes(x=Lengua_Indigena, y=value, fill = Lengua_Indigena)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+    
     ## SECTION D
 
     ## cambio de id y renomabriemnto de columna
