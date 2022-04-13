@@ -19,6 +19,18 @@ server <- function(input, output, session) {
     full_url_como_se_entero_cat <- base::paste0(base_url, "como_se_entero")
     full_url_canalizacion_seguimiento <- base::paste0(base_url, "canalizacion_seguimiento")
     full_url_instancia <- base::paste0(base_url, "instancia")
+    full_url_riesgo <- base::paste0(base_url, "riesgo")
+    full_url_sexos <- base::paste0(base_url, "sexo")
+    full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
+    full_url_modalidad <- base::paste0(base_url, "modalidad")
+
+    #api call
+    api_call_folio <- httr::GET(full_url_folio)
+    api_call_medio_contacto <- httr::GET(full_url_medio_contacto)
+    api_call_persona <- httr::GET(full_url_persona)
+    api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
+    api_call_riesgo <- httr::GET(full_url_riesgo)
+    api_call_sexos <- httr::GET(full_url_sexos)
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -27,6 +39,10 @@ server <- function(input, output, session) {
     como_se_entero_catalogo_json <- jsonlite::fromJSON(full_url_como_se_entero_cat)
     canalizacion_seguimiento_json <- jsonlite::fromJSON(full_url_canalizacion_seguimiento)
     instancia_json <- jsonlite::fromJSON(full_url_instancia)
+    riesgo_json <- jsonlite::fromJSON(full_url_riesgo)
+    sexos_json <- jsonlite::fromJSON(full_url_sexos)
+    tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
+    modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -35,6 +51,10 @@ server <- function(input, output, session) {
     como_se_entero_catalogo <- como_se_entero_catalogo_json$response
     canalizacion_seguimiento <- canalizacion_seguimiento_json$response
     instancia <- instancia_json$response
+    riesgos <- riesgo_json$response
+    sexos <- sexos_json$response
+    tipo_violencia <- tipo_violencia_json$response
+    modalidad <- modalidad_json$response
 
 
 
@@ -243,4 +263,181 @@ server <- function(input, output, session) {
                 axis.text.x = element_blank(),
                 axis.ticks.x = element_blank()),tooltip="text")
     })
+
+
+
+    ########################        DASHBOARD 2
+
+    ## SECTION A 
+    # Violencia experimentada
+
+    violencia_experimentada <- personas[,c("id_folio","tipoViolenciaPersona","modalidadPersona")]
+    colnames(violencia_experimentada)[2] <- "id_tipo_violencia"
+    colnames(violencia_experimentada)[3] <- "id_modalidad"
+
+    colnames(tipo_violencia)[2] <- "tipo_violencia"
+    colnames(modalidad)[2] <- "modalidad"
+
+    tipo_violencia_experimentada <- violencia_experimentada %>% count(id_tipo_violencia)
+    modalidad_experimentada <- violencia_experimentada %>% count(id_modalidad)
+
+    tipo_violencia_experimentada <- merge(tipo_violencia_experimentada,tipo_violencia)
+    modalidad_experimentada <- merge(modalidad_experimentada,modalidad)
+
+    count_tv_vs_m <- violencia_experimentada %>% group_by(id_tipo_violencia,id_modalidad) %>%
+        summarize(n = n())
+
+    tv_vs_m <- merge(count_tv_vs_m,tipo_violencia)
+    tv_vs_m <- merge(tv_vs_m,modalidad)
+
+    # histgrama de tipos de violencia
+    output$hist_tipo_violencia_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(tipo_violencia_experimentada, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"),tooltip="text")
+    })
+
+    # histograma de modalidad
+    output$hist_modalidad_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(modalidad_experimentada, aes(x = modalidad ,y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            xlab("Modalidad") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    # histograma combinado violencia vs modalidad
+    output$hist_tipo_vs_modalidad_anterior <- renderPlotly({
+        ggplotly(
+            ggplot(tv_vs_m, aes(x = tipo_violencia, y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    ## SECTION B
+    # Violencia actual
+
+    violencia_actual <- riesgos[,c("id_folio","violenciaRiesgo","modalidadRiesgo")]
+    colnames(violencia_actual)[2] <- "id_tipo_violencia"
+    colnames(violencia_actual)[3] <- "id_modalidad"
+    
+    tipo_violencia_actual <- violencia_actual %>% count(id_tipo_violencia)
+    modalidad_actual <- violencia_actual %>% count(id_modalidad)
+
+    tipo_violencia_actual <- merge(tipo_violencia_actual,tipo_violencia)
+    modalidad_actual <- merge(modalidad_actual,modalidad)
+
+    count_tv_vs_m_actual <- violencia_actual %>% group_by(id_tipo_violencia,id_modalidad) %>%
+        summarize(n = n())
+
+    tv_vs_m_actual <- merge(count_tv_vs_m_actual,tipo_violencia)
+    tv_vs_m_actual <- merge(tv_vs_m_actual,modalidad)
+
+
+    # histgrama de tipos de violencia
+    output$hist_tipo_violencia_actual <- renderPlotly({
+        ggplotly(
+            ggplot(tipo_violencia_actual, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"),tooltip="text")
+    })
+
+    # histograma de modalidad
+    output$hist_modalidad_actual <- renderPlotly({
+        ggplotly(
+            ggplot(modalidad_actual, aes(x = modalidad ,y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            xlab("Modalidad") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    # histograma combinado violencia vs modalidad
+    output$hist_tipo_vs_modalidad_actual <- renderPlotly({
+        ggplotly(
+            ggplot(tv_vs_m_actual, aes(x = tipo_violencia, y = n, fill = modalidad)) +
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            xlab("Tipos de Violencia") +
+            ylab("Frecuencia"), tooltip="text")
+    })
+
+    ## SECTION C
+
+    ## SECTION D
+
+    ## cambio de id y renomabriemnto de columna
+    colnames(riesgos)[4] <- "edad_agresor"
+    colnames(riesgos)[5] <- "id_sexo"
+
+    colnames(sexos)[2] <- "sexos_agresor_catalogo"
+
+    ### conteo de los datos de las columnas edad_agresor y id_sexo
+    conteo_edades_agresor <- riesgos %>% count(edad_agresor)
+
+    conteo_sexos_agresor <- riesgos %>% count(id_sexo)
+
+    ### unión de las tablas riesgos y sexos por el campo id_sexo
+    sexos_agresor_data <- merge(conteo_sexos_agresor, sexos)
+
+    ### gráfica de edad del agresor
+    output$edades_agresor_grf <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_edades_agresor, aes(x = edad_agresor, y = n, fill = edad_agresor)) +
+            geom_bar(stat = "identity") +
+            xlab("Edad Agresor") +
+            ylab("Frecuencia"))
+    })
+
+    ### gráfica de sexo del agresor
+    output$sexo_agresor_grf <- renderPlotly({
+        ggplotly(
+            ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
+            geom_bar(stat = "identity") + 
+            xlab("Sexo del Agresor") +
+            ylab("Frecuencia")
+        )
+    })
+
+### gráfica: ¿La dirección del agresor/a es la misma de quien solicita el servicio?
+
+dir <- riesgos[c("siDireccionAgresor","noDireccionAgresor")]
+
+count_si_dirs <- dir %>% filter(!is.na(siDireccionAgresor)) %>% count(siDireccionAgresor)
+count_no_dirs <- dir %>% filter(!is.na(noDireccionAgresor)) %>% count(noDireccionAgresor)
+
+count_total <- data.frame("Misma_direccion" = c("Si","No"),
+                          "n" = c(count_si_dirs$n,count_no_dirs$n))
+
+
+output$misma_dir_agresor_victima <- renderPlotly({
+    ggplotly(
+        ggplot(count_total,aes(x=Misma_direccion, y=n, fill=Misma_direccion)) +
+            geom_bar(stat = "identity") +
+            xlab("Misma dirección del agresor de quien solicita el servicio") +
+            ylab("Frecuencia")
+    )
+})
+
+
+
+    ### ¿La persona agresora cuenta con una red de apoyo?
+    red_apoyo <- riesgos[c("siRedApoyo","noRedApoyo")]
+    count_si_redAp <- red_apoyo %>% filter(!is.na(siRedApoyo)) %>% count(siRedApoyo)
+    count_no_redAp <- red_apoyo %>% filter(!is.na(noRedApoyo)) %>% count(noRedApoyo)
+
+    total_red_apoyo <- data.frame("Red_apoyo" = c("Si","No"),
+                          "n" = c(count_si_redAp$n, count_no_redAp$n))
+
+    output$red_apoyo_agresor <- renderPlotly({
+        ggplotly(
+            ggplot(total_red_apoyo, aes(x=Red_apoyo, y = n, fill=Red_apoyo)) +
+            geom_bar(stat = "identity") +
+            xlab("Red apoyo agresor") +
+            ylab("frecuencia")
+        )
+    })
+
  }

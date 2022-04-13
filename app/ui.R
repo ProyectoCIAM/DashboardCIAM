@@ -31,6 +31,7 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tabItems(
+    ############   TABS  DASHBOARD 1
     tabItem("contacto", h2("Medios de contacto"),  
       fluidRow(
         box(
@@ -83,10 +84,57 @@ body <- dashboardBody(
       mainPanel(
         plotlyOutput("calificacionesxinstancia")
         )),
-     tabItem("violencia", h2("Tipos de violencia experimentada")),
-     tabItem("vactuales", h2("Tipos de violencia actuales")),
+    ############   TABS  DASHBOARD 2
+     tabItem("violencia", h2("Tipos de violencia experimentada"),
+      fluidRow(
+        box(
+          title = "Tipos de Violencia Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_anterior")
+        ),
+        box(
+          title = "Modalidad Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_anterior")
+        ),
+        box(
+          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_anterior")
+        )
+      )),
+     tabItem("vactuales", h2("Tipos de violencia actuales"),
+      fluidRow(
+        box(
+          title = "Tipos de Violencia Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_actual")
+        ),
+        box(
+          title = "Modalidad Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_actual")
+        ),
+        box(
+          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_actual")
+        )
+      )),
      tabItem("demograficos", h2("Datos demográficos de la víctima")),
-     tabItem("agresor", h2("Datos del agresor")),
+     tabItem("agresor", h2("Datos del agresor"),
+      fluidRow(
+        box(
+          title = "Edad del agresor", width = 6, solidHeader = TRUE,
+          plotlyOutput("edades_agresor_grf")
+        ),
+        box(
+          title = "Sexo del agresor", width = 6, solidHeader = TRUE,
+          plotlyOutput("sexo_agresor_grf")
+        ),
+        box(
+          title = "La dirección del agresor es la misma que de quien solicita el servico", width = 6, solidHeader = TRUE,
+          plotlyOutput("misma_dir_agresor_victima")
+        ),
+        box(title = "¿La persona agresora cuenta con red de apoyo?", width = 6, solidHeader = TRUE,
+        plotlyOutput("red_apoyo_agresor"))
+      ),
+     ),
+    ############   TABS  DASHBOARD 3
      tabItem("instalaciones", h2("Calificación de las instalaciones")),
      tabItem("servicios", h2("Calificación de los servicios")),
      tabItem("ucanalizacion", h2("Utilidad de la canalización")),
