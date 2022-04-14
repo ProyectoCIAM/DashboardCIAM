@@ -50,36 +50,31 @@ body <- dashboardBody(
     ),
     tabItem("canalizacion", h2("Canalización anterior a otra instancia"),
       fluidRow(
-        box(
-          title = "¿Ha sido canalizada/o a otras instancias con anterioridad?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxAnterior")
+        tabBox(
+          tabPanel("Sección A", "¿Ha sido canalizada/o a otras instancias con anterioridad?", plotlyOutput("canalizacionxAnterior")),
+
+          tabPanel("Sección B", "¿Ha tenido seguimiento?", plotlyOutput("canalizacionxSeguimiento"))
         ),
-        box(
-          title = "¿Ha tenido seguimiento?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxSeguimiento")
+
+        tabBox(
+          tabPanel("Sección C", "¿Considera que el medio de contacto fue el adecuado?", plotlyOutput("canalizacionxAdecuado")),
+
+          tabPanel("Sección D", "¿Considera que el servicio fue oportuno (en el momento adecuado)?", plotlyOutput("canalizacionxOportuno")) 
         ),
-        box(
-          title = "¿Considera que el medio de contacto fue el adecuado?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxAdecuado")
-        ),
-        box(
-          title = "¿Considera que el servicio fue oportuno (en el momento adecuado)?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxOportuno")
-        ),
-        box(
-          title = "¿Recibió atención con prontitud?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxProntitud")
-        ),
-        box(
-          title = "¿Se sintió en confianza y seguro durante la atención?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxConfianza")
-        ),
-        box(
-          title = "¿Sintió en todo momento que su caso fue tratado con respeto?", width = 6, solidHeader = FALSE,
-          plotlyOutput("canalizacionxRespeto")
-        )
-      )
+
+        tabBox(
+         width = 12,
+         tabPanel("Sección E", "¿Recibió atención con prontitud?", plotlyOutput("canalizacionxProntitud")),
+
+         tabPanel("Sección F", "¿Se sintió en confianza y seguro durante la atención?", plotlyOutput("canalizacionxConfianza")),
+
+         tabPanel("Sección G", "¿Sintió en todo momento que su caso fue tratado con respeto?", plotlyOutput("canalizacionxRespeto"))
+      ),
+
+
+      ),
     ),
+
      tabItem("instancias", h2("Calificaciones por instancia"),
       mainPanel(
         plotlyOutput("calificacionesxinstancia")
@@ -96,7 +91,7 @@ body <- dashboardBody(
           plotlyOutput("hist_modalidad_anterior")
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 12, solidHeader = TRUE,
           plotlyOutput("hist_tipo_vs_modalidad_anterior")
         )
       )),
@@ -111,7 +106,7 @@ body <- dashboardBody(
           plotlyOutput("hist_modalidad_actual")
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 6, solidHeader = TRUE,
+          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 12, solidHeader = TRUE,
           plotlyOutput("hist_tipo_vs_modalidad_actual")
         )
       )),
