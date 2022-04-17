@@ -121,12 +121,27 @@ body <- dashboardBody(
           plotlyOutput("personasxDiscapacidad")
         ),
         box(
+          title = "Residencias", width = 12, solidHeader = FALSE,
+          tabBox(
+            width = 12,
+            tabPanel("Localidad", "", plotlyOutput("personasxLocalidad")),
+
+            tabPanel("Estado", "", plotlyOutput("personasxEstado")),
+
+            tabPanel("Pais", "", plotlyOutput("personasxPais"))
+          ),
+        ),
+        box(
           title = "¿Pertenece a pueblos originarios?", width = 6, solidHeader = FALSE,
           plotlyOutput("personasxPueblos")
         ),
         box(
           title = "¿Habla alguna lengua indígena?", width = 6, solidHeader = FALSE,
           plotlyOutput("personasxLengua_Indigena")
+        ),
+        box(
+          title = "Tipos de servicio", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxServicio")
         )
       )
     ),

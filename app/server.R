@@ -9,8 +9,8 @@ library(httr)
 
 server <- function(input, output, session) {
     # llamada tablas
-    #base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")
@@ -379,6 +379,51 @@ server <- function(input, output, session) {
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
+    output$personasxLocalidad <- renderPlotly({
+        countLoc <- personas %>% count(personas$localidadResidenciaPersona)
+        colnames(countLoc)[1] <- "locations"
+
+        respuestas_Localidad <- data.frame(Localidad = c(countLoc$locations), value = c(countLoc$n))
+
+        ggplotly(
+        ggplot(respuestas_Localidad, aes(x=Localidad, y=value, fill = Localidad)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Localidades")+
+            coord_flip()
+        )
+    })
+
+    output$personasxEstado <- renderPlotly({
+        countEst <- personas %>% count(personas$estadoResidenciaPersona)
+        colnames(countEst)[1] <- "locations"
+
+        respuestas_Estado <- data.frame(Estado = c(countEst$locations), value = c(countEst$n))
+
+        ggplotly(
+        ggplot(respuestas_Estado, aes(x=Estado, y=value, fill = Estado)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Estados")+
+            coord_flip()
+        )
+    })
+
+    output$personasxPais <- renderPlotly({
+        countPais <- personas %>% count(personas$paisResidenciaPersona)
+        colnames(countPais)[1] <- "locations"
+
+        respuestas_Pais <- data.frame(Pais = c(countPais$locations), value = c(countPais$n))
+
+        ggplotly(
+        ggplot(respuestas_Pais, aes(x=Pais, y=value, fill = Pais)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Localidades")+
+            coord_flip()
+        )
+    })
+
     output$personasxDiscapacidad <- renderPlotly({
         personas_Discapacidad_si <- sum(!is.na(personas$siDiscapacidadPersona))
         personas_Discapacidad_no <- sum(!is.na(personas$noDiscapacidadPersona))
@@ -419,6 +464,23 @@ server <- function(input, output, session) {
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxServicio <- renderPlotly({
+        primerServ <- count(filter(personas, servicioPersona == 1))
+        segundoServ <- count(filter(personas, servicioPersona == 2))
+        tercerServ <- count(filter(personas, servicioPersona == 3))
+        otrosServ <- count(filter(personas, servicioPersona > 3))
+        
+        respuestas_Tipo_Servicio <- data.frame(Tipo_Servicio = c("Atención en crisis", "Asesoría psicológica", "Canalización", "Otros"), value = c(primerServ$n,segundoServ$n,tercerServ$n,otrosServ$n))
+        
+        ggplotly(
+            ggplot(respuestas_Tipo_Servicio, aes(x=Tipo_Servicio, y=value, fill = Tipo_Servicio)) +
+            geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 60, hjust=1)) +
+            ylab("Personas")+
+            xlab("Servicios")
+        )
     })
     
     ## SECTION D
