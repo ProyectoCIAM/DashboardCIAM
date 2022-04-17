@@ -365,6 +365,25 @@ server <- function(input, output, session) {
     })
 
     ## SECTION C
+    output$personasxEdad <- renderPlotly({
+        countEdad <- personas %>% count(personas$edadPersona)
+        colnames(countEdad)[1] <- "edad"
+        print(countEdad)
+        x_num <- as.numeric(countEdad$edad)    
+        print(x_num)
+        rangeTable <- findInterval(as.numeric(x_num), c(0,12), rightmost.closed=T)
+        print("RANGE")
+        print(rangeTable)
+        respuestas_Edad <- data.frame(Edad = c(countEdad$edad), value = c(countEdad$n))
+
+        ggplotly(
+        ggplot(respuestas_Edad, aes(x=Edad, y=value, fill = Edad)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Edades")+
+            coord_flip()
+        )
+    })
     output$personasxLGBT <- renderPlotly({
         personas_LGBT_si <- sum(!is.na(personas$siLGBPersona))
         personas_LGBT_no <- sum(!is.na(personas$noLGBPersona))

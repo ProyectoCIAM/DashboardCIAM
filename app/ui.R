@@ -113,6 +113,10 @@ body <- dashboardBody(
      tabItem("demograficos", h2("Datos demográficos de la víctima"),
       fluidRow(
         box(
+          title = "Personas Edades", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxEdad")
+        ),
+        box(
           title = "Personas LGBT", width = 6, solidHeader = FALSE,
           plotlyOutput("personasxLGBT")
         ),
