@@ -368,12 +368,16 @@ server <- function(input, output, session) {
     output$personasxEdad <- renderPlotly({
         countEdad <- personas %>% count(personas$edadPersona)
         colnames(countEdad)[1] <- "edad"
-        print(countEdad)
-        x_num <- as.numeric(countEdad$edad)    
-        print(x_num)
-        rangeTable <- findInterval(as.numeric(x_num), c(0,12), rightmost.closed=T)
-        print("RANGE")
-        print(rangeTable)
+        # print(countEdad)
+        # rangeOne <- count(between(personas$edadPersona, 0, 10) == TRUEy)
+        # rangeTwo <- between(personas$edadPersona, 11, 20)
+        # rangeThre <- between(personas$edadPersona, 21, 30)
+        # print(rangeOne)
+        # 0,10
+        # 11,20
+        # 21,30
+        # 31,40
+        # 41,50
         respuestas_Edad <- data.frame(Edad = c(countEdad$edad), value = c(countEdad$n))
 
         ggplotly(
