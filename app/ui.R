@@ -173,7 +173,14 @@ body <- dashboardBody(
      tabItem("ucanalizacion", h2("Utilidad de la canalización")),
      tabItem("sexterno", h2("Calificación del servicio externo")),
      tabItem("sesiones", h2("Número de sesiones por edad y sexo")),
-     tabItem("soportuno", h2("Servicio oportuno e importante")),
+     tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
+       tabBox(
+         tabPanel("Sección F p.1","¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", plotlyOutput("si_servicio")),
+         
+         tabPanel("Sección F p.2", "¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?")
+      ),
+     ),
+    ),
      tabItem("atencion", h2("Calificaciones de atención brindada"))
    )
   )

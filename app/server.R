@@ -9,8 +9,8 @@ library(httr)
 
 server <- function(input, output, session) {
     # llamada tablas
-    base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    #base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")
@@ -23,6 +23,7 @@ server <- function(input, output, session) {
     full_url_sexos <- base::paste0(base_url, "sexo")
     full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
     full_url_modalidad <- base::paste0(base_url, "modalidad")
+    full_url_satisfaccion <- base::paste0(base_url, "satisfaccion")
 
     #api call
     api_call_folio <- httr::GET(full_url_folio)
@@ -31,6 +32,7 @@ server <- function(input, output, session) {
     api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
     api_call_riesgo <- httr::GET(full_url_riesgo)
     api_call_sexos <- httr::GET(full_url_sexos)
+    api_call_satisfaccion <- httr::GET(full_url_satisfaccion)
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -43,6 +45,7 @@ server <- function(input, output, session) {
     sexos_json <- jsonlite::fromJSON(full_url_sexos)
     tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
     modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
+    satisfaccion_json <- jsonlite::fromJSON(full_url_satisfaccion)
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -55,6 +58,7 @@ server <- function(input, output, session) {
     sexos <- sexos_json$response
     tipo_violencia <- tipo_violencia_json$response
     modalidad <- modalidad_json$response
+    satisfaccion <- satisfaccion_json$response
 
 
 
@@ -579,5 +583,37 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ylab("frecuencia")
         )
     })
+
+
+########################        DASHBOARD 3
+
+##SECTION A
+##SECTION B
+##SECTION C
+##SECTION D
+##SECTION E
+
+
+##SECTION F
+
+#Principal: 6. ¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?
+
+
+conteo_si_servicio <- satisfaccion %>% count(siservicios)
+
+output$si_servicio <- renderPlotly({
+    ggplotly(
+        ggplot(conteo_si_servicio, aes(x = siservicios, y = n, fill = siservicios)) +
+        geom_bar(stat = "identity") +
+        xlab("Recibieron servicio de acompañamiento emocional") +
+        ylab("Frecuencia"))
+})
+
+#12. ¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?
+
+##SECTION G
+
+
+
 
  }
