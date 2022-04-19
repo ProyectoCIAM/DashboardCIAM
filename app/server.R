@@ -23,6 +23,7 @@ server <- function(input, output, session) {
     full_url_sexos <- base::paste0(base_url, "sexo")
     full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
     full_url_modalidad <- base::paste0(base_url, "modalidad")
+    full_url_encuesta_satisfaccion <- base::paste0(base_url, "satisfaccion")
 
     #api call
     api_call_folio <- httr::GET(full_url_folio)
@@ -31,6 +32,7 @@ server <- function(input, output, session) {
     api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
     api_call_riesgo <- httr::GET(full_url_riesgo)
     api_call_sexos <- httr::GET(full_url_sexos)
+    api_call_encuesta_satisfaccion <- httr::GET(full_url_encuesta_satisfaccion)
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -43,6 +45,7 @@ server <- function(input, output, session) {
     sexos_json <- jsonlite::fromJSON(full_url_sexos)
     tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
     modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
+    encuesta_satisfaccion_json <- jsonlite::fromJSON(full_url_encuesta_satisfaccion)
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -55,6 +58,7 @@ server <- function(input, output, session) {
     sexos <- sexos_json$response
     tipo_violencia <- tipo_violencia_json$response
     modalidad <- modalidad_json$response
+    encuesta_satisfaccion <- encuesta_satisfaccion_json$response
 
 
 
@@ -368,12 +372,6 @@ server <- function(input, output, session) {
     output$personasxEdad <- renderPlotly({
         countEdad <- personas %>% count(personas$edadPersona)
         colnames(countEdad)[1] <- "edad"
-        print(countEdad)
-        x_num <- as.numeric(countEdad$edad)    
-        print(x_num)
-        rangeTable <- findInterval(as.numeric(x_num), c(0,12), rightmost.closed=T)
-        print("RANGE")
-        print(rangeTable)
         respuestas_Edad <- data.frame(Edad = c(countEdad$edad), value = c(countEdad$n))
 
         ggplotly(
@@ -384,6 +382,7 @@ server <- function(input, output, session) {
             coord_flip()
         )
     })
+
     output$personasxLGBT <- renderPlotly({
         personas_LGBT_si <- sum(!is.na(personas$siLGBPersona))
         personas_LGBT_no <- sum(!is.na(personas$noLGBPersona))
@@ -396,6 +395,25 @@ server <- function(input, output, session) {
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxSexo <- renderPlotly({
+        colnames(sexos)[2] <- "sexoPersona"
+        colnames(personas)[3] <- "id_sexo"
+        sexo <- sexos %>% group_by(id_sexo) %>% slice(1)
+        sexos_data <- merge(personas, sexo, by="id_sexo")
+
+        countSexo <- sexos_data %>% count(sexoPersona)
+        colnames(countSexo)[1] <- "sexo"
+
+        respuestas_Sexo <- data.frame(Sexo = c(countSexo$sexo), value = c(countSexo$n))
+
+        ggplotly(
+        ggplot(respuestas_Sexo, aes(x=Sexo, y=value, fill = Sexo)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Identidad")
+        )
     })
 
     output$personasxLocalidad <- renderPlotly({
@@ -576,4 +594,40 @@ output$misma_dir_agresor_victima <- renderPlotly({
         )
     })
 
- }
+    ####################### DASHBOARD 3
+
+    ##SECCION D
+
+    output$satisfaccionxServicio <- renderPlotly({
+        califxServicio <- encuesta_satisfaccion %>% group_by(institucion) %>%
+            summarize(promedio = round(mean(as.numeric(calificacionServicios)), 2)) %>%
+            arrange(desc(promedio)) %>%
+            mutate(institucion = factor(institucion, levels = institucion))
+
+        colnames(califxServicio)[1] <- "institucion"
+
+        respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
+
+        ggplotly(
+        ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Instituciones")
+        )
+    })
+
+    output$satisfaccionxUtil <- renderPlotly({
+        encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
+        encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
+
+        respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
+
+        ggplotly(
+        ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+}
