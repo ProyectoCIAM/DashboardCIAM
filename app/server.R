@@ -23,7 +23,7 @@ server <- function(input, output, session) {
     full_url_sexos <- base::paste0(base_url, "sexo")
     full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
     full_url_modalidad <- base::paste0(base_url, "modalidad")
-    full_url_satisfaccion <- base::paste0(base_url, "satisfaccion")
+    full_url_encuesta_satisfaccion <- base::paste0(base_url, "satisfaccion")
 
     #api call
     api_call_folio <- httr::GET(full_url_folio)
@@ -32,7 +32,8 @@ server <- function(input, output, session) {
     api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
     api_call_riesgo <- httr::GET(full_url_riesgo)
     api_call_sexos <- httr::GET(full_url_sexos)
-    api_call_satisfaccion <- httr::GET(full_url_satisfaccion)
+    api_call_encuesta_satisfaccion <- httr::GET(full_url_encuesta_satisfaccion)
+
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -45,7 +46,8 @@ server <- function(input, output, session) {
     sexos_json <- jsonlite::fromJSON(full_url_sexos)
     tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
     modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
-    satisfaccion_json <- jsonlite::fromJSON(full_url_satisfaccion)
+    encuesta_satisfaccion_json <- jsonlite::fromJSON(full_url_encuesta_satisfaccion)
+
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -58,7 +60,7 @@ server <- function(input, output, session) {
     sexos <- sexos_json$response
     tipo_violencia <- tipo_violencia_json$response
     modalidad <- modalidad_json$response
-    satisfaccion <- satisfaccion_json$response
+    encuesta_satisfaccion <- encuesta_satisfaccion_json$response
 
 
 
@@ -372,16 +374,6 @@ server <- function(input, output, session) {
     output$personasxEdad <- renderPlotly({
         countEdad <- personas %>% count(personas$edadPersona)
         colnames(countEdad)[1] <- "edad"
-        # print(countEdad)
-        # rangeOne <- count(between(personas$edadPersona, 0, 10) == TRUEy)
-        # rangeTwo <- between(personas$edadPersona, 11, 20)
-        # rangeThre <- between(personas$edadPersona, 21, 30)
-        # print(rangeOne)
-        # 0,10
-        # 11,20
-        # 21,30
-        # 31,40
-        # 41,50
         respuestas_Edad <- data.frame(Edad = c(countEdad$edad), value = c(countEdad$n))
 
         ggplotly(
@@ -392,6 +384,7 @@ server <- function(input, output, session) {
             coord_flip()
         )
     })
+
     output$personasxLGBT <- renderPlotly({
         personas_LGBT_si <- sum(!is.na(personas$siLGBPersona))
         personas_LGBT_no <- sum(!is.na(personas$noLGBPersona))
@@ -404,6 +397,25 @@ server <- function(input, output, session) {
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
+
+    output$personasxSexo <- renderPlotly({
+        colnames(sexos)[2] <- "sexoPersona"
+        colnames(personas)[3] <- "id_sexo"
+        sexo <- sexos %>% group_by(id_sexo) %>% slice(1)
+        sexos_data <- merge(personas, sexo, by="id_sexo")
+
+        countSexo <- sexos_data %>% count(sexoPersona)
+        colnames(countSexo)[1] <- "sexo"
+
+        respuestas_Sexo <- data.frame(Sexo = c(countSexo$sexo), value = c(countSexo$n))
+
+        ggplotly(
+        ggplot(respuestas_Sexo, aes(x=Sexo, y=value, fill = Sexo)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Identidad")
+        )
     })
 
     output$personasxLocalidad <- renderPlotly({
@@ -545,75 +557,118 @@ server <- function(input, output, session) {
         )
     })
 
-### gráfica: ¿La dirección del agresor/a es la misma de quien solicita el servicio?
+    ### gráfica: ¿La dirección del agresor/a es la misma de quien solicita el servicio?
 
-dir <- riesgos[c("siDireccionAgresor","noDireccionAgresor")]
+    dir <- riesgos[c("siDireccionAgresor","noDireccionAgresor")]
 
-count_si_dirs <- dir %>% filter(!is.na(siDireccionAgresor)) %>% count(siDireccionAgresor)
-count_no_dirs <- dir %>% filter(!is.na(noDireccionAgresor)) %>% count(noDireccionAgresor)
+    count_si_dirs <- dir %>% filter(!is.na(siDireccionAgresor)) %>% count(siDireccionAgresor)
+    count_no_dirs <- dir %>% filter(!is.na(noDireccionAgresor)) %>% count(noDireccionAgresor)
 
-count_total <- data.frame("Misma_direccion" = c("Si","No"),
-                          "n" = c(count_si_dirs$n,count_no_dirs$n))
-
-
-output$misma_dir_agresor_victima <- renderPlotly({
-    ggplotly(
-        ggplot(count_total,aes(x=Misma_direccion, y=n, fill=Misma_direccion)) +
-            geom_bar(stat = "identity") +
-            xlab("Misma dirección del agresor de quien solicita el servicio") +
-            ylab("Frecuencia")
-    )
-})
+    count_total <- data.frame("Misma_direccion" = c("Si","No"),
+                            "n" = c(count_si_dirs$n,count_no_dirs$n))
 
 
-
-    ### ¿La persona agresora cuenta con una red de apoyo?
-    red_apoyo <- riesgos[c("siRedApoyo","noRedApoyo")]
-    count_si_redAp <- red_apoyo %>% filter(!is.na(siRedApoyo)) %>% count(siRedApoyo)
-    count_no_redAp <- red_apoyo %>% filter(!is.na(noRedApoyo)) %>% count(noRedApoyo)
-
-    total_red_apoyo <- data.frame("Red_apoyo" = c("Si","No"),
-                          "n" = c(count_si_redAp$n, count_no_redAp$n))
-
-    output$red_apoyo_agresor <- renderPlotly({
+    output$misma_dir_agresor_victima <- renderPlotly({
         ggplotly(
-            ggplot(total_red_apoyo, aes(x=Red_apoyo, y = n, fill=Red_apoyo)) +
-            geom_bar(stat = "identity") +
-            xlab("Red apoyo agresor") +
-            ylab("frecuencia")
+            ggplot(count_total,aes(x=Misma_direccion, y=n, fill=Misma_direccion)) +
+                geom_bar(stat = "identity") +
+                xlab("Misma dirección del agresor de quien solicita el servicio") +
+                ylab("Frecuencia")
         )
     })
 
 
-########################        DASHBOARD 3
 
-##SECTION A
-##SECTION B
-##SECTION C
-##SECTION D
-##SECTION E
+        ### ¿La persona agresora cuenta con una red de apoyo?
+        red_apoyo <- riesgos[c("siRedApoyo","noRedApoyo")]
+        count_si_redAp <- red_apoyo %>% filter(!is.na(siRedApoyo)) %>% count(siRedApoyo)
+        count_no_redAp <- red_apoyo %>% filter(!is.na(noRedApoyo)) %>% count(noRedApoyo)
 
+        total_red_apoyo <- data.frame("Red_apoyo" = c("Si","No"),
+                            "n" = c(count_si_redAp$n, count_no_redAp$n))
 
-##SECTION F
-
-#Principal: 6. ¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?
-
-
-conteo_si_servicio <- satisfaccion %>% count(siservicios)
-
-output$si_servicio <- renderPlotly({
-    ggplotly(
-        ggplot(conteo_si_servicio, aes(x = siservicios, y = n, fill = siservicios)) +
-        geom_bar(stat = "identity") +
-        xlab("Recibieron servicio de acompañamiento emocional") +
-        ylab("Frecuencia"))
-})
-
-#12. ¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?
-
-##SECTION G
+        output$red_apoyo_agresor <- renderPlotly({
+            ggplotly(
+                ggplot(total_red_apoyo, aes(x=Red_apoyo, y = n, fill=Red_apoyo)) +
+                geom_bar(stat = "identity") +
+                xlab("Red apoyo agresor") +
+                ylab("frecuencia")
+            )
+        })
 
 
+    ########################        DASHBOARD 3
+
+    ##SECTION A
+    ##SECTION B
+    ##SECTION C
+
+    ##SECCION D
+
+        output$satisfaccionxServicio <- renderPlotly({
+            califxServicio <- encuesta_satisfaccion %>% group_by(institucion) %>%
+                summarize(promedio = round(mean(as.numeric(calificacionServicios)), 2)) %>%
+                arrange(desc(promedio)) %>%
+                mutate(institucion = factor(institucion, levels = institucion))
+
+            colnames(califxServicio)[1] <- "institucion"
+
+            respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
+
+            ggplotly(
+            ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
+            geom_bar(stat="identity") + 
+                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+                xlab("Instituciones")
+            )
+        })
+
+        output$satisfaccionxUtil <- renderPlotly({
+            encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
+            encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
+
+            respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
+
+            ggplotly(
+            ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
+            geom_bar(stat="identity") + 
+                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+                xlab("Respuesta")+
+                scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+        })
 
 
- }
+    ##SECTION F
+
+    #Principal: 6. ¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?
+
+
+    conteo_si_servicio <- encuesta_satisfaccion %>% count(siservicios)
+
+    output$si_servicio <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_si_servicio, aes(x = siservicios, y = n, fill = siservicios)) +
+            geom_bar(stat = "identity") +
+            xlab("Recibieron servicio de acompañamiento emocional") +
+            ylab("Frecuencia"))
+    })
+
+    #12. ¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?
+
+    ##SECTION G
+
+
+
+
+
+
+
+}
+   
+
+
+
+
+
+
+

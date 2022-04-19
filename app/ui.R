@@ -117,12 +117,23 @@ body <- dashboardBody(
           plotlyOutput("personasxEdad")
         ),
         box(
-          title = "Personas LGBT", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxLGBT")
+          title = "Tipos de servicio", width = 6, solidHeader = FALSE,
+          plotlyOutput("personasxServicio")
         ),
         box(
-          title = "¿Cuenta con alguna discapacidad?", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxDiscapacidad")
+          title = "Datos demográficos", width = 12, solidHeader = FALSE,
+          tabBox(
+            width = 12,
+            tabPanel("Personas LGBT", "", plotlyOutput("personasxLGBT")),
+
+            tabPanel("Identidad sexogenerica", "", plotlyOutput("personasxSexo")),
+
+            tabPanel("¿Cuenta con alguna discapacidad?", "", plotlyOutput("personasxDiscapacidad")),
+
+            tabPanel("¿Pertenece a pueblos originarios?", "", plotlyOutput("personasxPueblos")),
+
+            tabPanel("¿Habla alguna lengua indígena?", "", plotlyOutput("personasxLengua_Indigena"))
+          ),
         ),
         box(
           title = "Residencias", width = 12, solidHeader = FALSE,
@@ -134,18 +145,6 @@ body <- dashboardBody(
 
             tabPanel("Pais", "", plotlyOutput("personasxPais"))
           ),
-        ),
-        box(
-          title = "¿Pertenece a pueblos originarios?", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxPueblos")
-        ),
-        box(
-          title = "¿Habla alguna lengua indígena?", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxLengua_Indigena")
-        ),
-        box(
-          title = "Tipos de servicio", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxServicio")
         )
       )
     ),
@@ -171,7 +170,18 @@ body <- dashboardBody(
      tabItem("instalaciones", h2("Calificación de las instalaciones")),
      tabItem("servicios", h2("Calificación de los servicios")),
      tabItem("ucanalizacion", h2("Utilidad de la canalización")),
-     tabItem("sexterno", h2("Calificación del servicio externo")),
+     tabItem("sexterno", h2("Calificación del servicio externo"),
+      fluidRow(
+        box(
+          title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 6, solidHeader = TRUE,
+          plotlyOutput("satisfaccionxServicio")
+        ),
+        box(
+          title = "¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", width = 6, solidHeader = TRUE,
+          plotlyOutput("satisfaccionxUtil")
+        ),
+      )
+     ),
      tabItem("sesiones", h2("Número de sesiones por edad y sexo")),
      tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
        tabBox(
