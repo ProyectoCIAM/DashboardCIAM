@@ -173,13 +173,19 @@ body <- dashboardBody(
      tabItem("sexterno", h2("Calificación del servicio externo"),
       fluidRow(
         box(
-          title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 6, solidHeader = TRUE,
-          plotlyOutput("satisfaccionxServicio")
+          title = "", width = 12, solidHeader = TRUE,
+          tabBox(
+            width = 12,
+            tabPanel("¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", "", plotlyOutput("satisfaccionxServicio")),
+
+            tabPanel("¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", "", plotlyOutput("satisfaccionxUtil")),
+          ),
+          # plotlyOutput("satisfaccionxServicio")
         ),
-        box(
-          title = "¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", width = 6, solidHeader = TRUE,
-          plotlyOutput("satisfaccionxUtil")
-        ),
+        # box(
+        #   title = "", width = 12, solidHeader = TRUE,
+        #   plotlyOutput("satisfaccionxUtil")
+        # ),
       )
      ),
      tabItem("sesiones", h2("Número de sesiones por edad y sexo")),

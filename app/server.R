@@ -599,8 +599,14 @@ output$misma_dir_agresor_victima <- renderPlotly({
     ##SECCION D
 
     output$satisfaccionxServicio <- renderPlotly({
-        califxServicio <- encuesta_satisfaccion %>% group_by(institucion) %>%
-            summarize(promedio = round(mean(as.numeric(calificacionServicios)), 2)) %>%
+        colnames(instancia)[2] <- "institucion"
+        colnames(encuesta_satisfaccion)[24] <- "id_instancia"
+        
+        instancia_new <- instancia %>% group_by(id_instancia) %>% slice(1)
+        
+        satisfaccion_data <- merge(encuesta_satisfaccion, instancia_new, by="id_instancia")
+        califxServicio <- satisfaccion_data %>% group_by(institucion) %>%
+            summarize(promedio = round(mean(as.numeric(calificacionInstancia)), 2)) %>%
             arrange(desc(promedio)) %>%
             mutate(institucion = factor(institucion, levels = institucion))
 
@@ -611,8 +617,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
         ggplotly(
         ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-            xlab("Instituciones")
+        theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+        xlab("Instituciones")+
+        ylab("Promedio de calificación")+
+        coord_flip()
         )
     })
 
