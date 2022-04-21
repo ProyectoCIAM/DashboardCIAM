@@ -193,7 +193,7 @@ body <- dashboardBody(
     ),
      tabItem("atencion", h2("Calificaciones de atención brindada"),
      fluidRow(
-       box(title = "¿Cómo califica la vía de atención, se adaptó a sus necesidades? (La vía de atención se da por llamadas telefónicas, mensajes de texto y WhatsApp, presencial, etc.)", width = 6, solidHeader = TRUE),
+       box(title = "¿Cómo califica la vía de atención, se adaptó a sus necesidades?", width = 6, solidHeader = TRUE, plotlyOutput("via_atencion")),
 
        box(title = "¿Cómo califica la confianza y seguridad que le hicieron sentir durante la atención?", width = 6, solidHeader = TRUE, plotlyOutput("calificacion_confianza_seguridad")),
 

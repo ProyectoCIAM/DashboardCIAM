@@ -672,7 +672,16 @@ output$misma_dir_agresor_victima <- renderPlotly({
 
     #7. ¿Cómo califica la vía de atención, se adaptó a sus necesidades? (La vía de atención se da por llamadas telefónicas, mensajes de texto y WhatsApp, presencial, etc.)
 
+    conteo_via_atencion <- encuesta_satisfaccion %>% count(viaAdapto)
 
+    output$via_atencion <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_via_atencion, aes(x = viaAdapto, y = n, fill = viaAdapto)) + 
+            geom_bar(stat = "identity") +
+            xlab("Calificación de la vía de atención") +
+            ylab("Frecuencia")
+        )
+    })
 
 
     #8. ¿Cómo califica la confianza y seguridad que le hicieron sentir durante la atención?
