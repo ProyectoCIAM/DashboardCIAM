@@ -189,8 +189,25 @@ body <- dashboardBody(
       )
      ),
      tabItem("sesiones", h2("Número de sesiones por edad y sexo")),
-     tabItem("soportuno", h2("Servicio oportuno e importante")),
-     tabItem("atencion", h2("Calificaciones de atención brindada"))
+     tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
+       box(title = "¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", width = 6, solidHeader = TRUE,
+       plotlyOutput("si_servicio")),
+
+       box(title = "¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?", width = 6, solidHeader = TRUE,
+       plotlyOutput("servicio_importante")),
+     ),
+    ),
+     tabItem("atencion", h2("Calificaciones de atención brindada"),
+     fluidRow(
+       box(title = "¿Cómo califica la vía de atención, se adaptó a sus necesidades?", width = 6, solidHeader = TRUE, plotlyOutput("via_atencion")),
+
+       box(title = "¿Cómo califica la confianza y seguridad que le hicieron sentir durante la atención?", width = 6, solidHeader = TRUE, plotlyOutput("calificacion_confianza_seguridad")),
+
+       box(title = "Califique por favor el respeto con el que sintió que fue tratada/o durante el Acompañamiento Emocional", width = 6, solidHeader = TRUE, plotlyOutput("respeto_sesiones")),
+
+       box(title = "¿Qué tan satisfactorio fue el trato que le brindó el equipo de Acompañamiento Emocional de CIAM?", width = 6, solidHeader = TRUE, plotlyOutput("serv_satisfactorio")),
+     ),
+     )
    )
   )
 

@@ -1,16 +1,17 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
+library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
 library(httr)
 
     
 
-server <- function(input, output, session) {
+server <- function(input, output, session) { 
     # llamada tablas
-    base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    #base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")
@@ -34,6 +35,7 @@ server <- function(input, output, session) {
     api_call_sexos <- httr::GET(full_url_sexos)
     api_call_encuesta_satisfaccion <- httr::GET(full_url_encuesta_satisfaccion)
 
+
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
     medio_contacto_json <- jsonlite::fromJSON(full_url_medio_contacto)
@@ -46,6 +48,7 @@ server <- function(input, output, session) {
     tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
     modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
     encuesta_satisfaccion_json <- jsonlite::fromJSON(full_url_encuesta_satisfaccion)
+
 
     #retrieving api's response leaving the status out
     folios <- folios_json$response
@@ -594,48 +597,138 @@ output$misma_dir_agresor_victima <- renderPlotly({
         )
     })
 
-    ####################### DASHBOARD 3
+
+
+    ########################        DASHBOARD 3
+
+    ##SECTION A
+    ##SECTION B
+    ##SECTION C
 
     ##SECCION D
 
-    output$satisfaccionxServicio <- renderPlotly({
-        colnames(instancia)[2] <- "institucion"
-        colnames(encuesta_satisfaccion)[24] <- "id_instancia"
-        
-        instancia_new <- instancia %>% group_by(id_instancia) %>% slice(1)
-        
-        satisfaccion_data <- merge(encuesta_satisfaccion, instancia_new, by="id_instancia")
-        califxServicio <- satisfaccion_data %>% group_by(institucion) %>%
-            summarize(promedio = round(mean(as.numeric(calificacionInstancia)), 2)) %>%
-            arrange(desc(promedio)) %>%
-            mutate(institucion = factor(institucion, levels = institucion))
+        output$satisfaccionxServicio <- renderPlotly({
+            califxServicio <- encuesta_satisfaccion %>% group_by(institucion) %>%
+                summarize(promedio = round(mean(as.numeric(calificacionServicios)), 2)) %>%
+                arrange(desc(promedio)) %>%
+                mutate(institucion = factor(institucion, levels = institucion))
 
-        colnames(califxServicio)[1] <- "institucion"
+            colnames(califxServicio)[1] <- "institucion"
 
-        respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
+            respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
 
+            ggplotly(
+            ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
+            geom_bar(stat="identity") + 
+                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+                xlab("Instituciones")
+            )
+        })
+
+        output$satisfaccionxUtil <- renderPlotly({
+            encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
+            encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
+
+            respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
+
+            ggplotly(
+            ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
+            geom_bar(stat="identity") + 
+                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+                xlab("Respuesta")+
+                scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+        })
+
+
+    ##SECTION F
+
+    #Principal: 6. ¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?
+
+    conteo_si_servicio <- encuesta_satisfaccion %>% count(siservicios)
+
+    output$si_servicio <- renderPlotly({
         ggplotly(
-        ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
-        geom_bar(stat="identity") + 
-        theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-        xlab("Instituciones")+
-        ylab("Promedio de calificación")+
-        coord_flip()
+        ggplot(conteo_si_servicio, aes(x = siservicios, y = n, fill = siservicios)) +
+            geom_bar(stat = "identity") +
+            xlab("Recibieron servicio de acompañamiento emocional") +
+            ylab("Frecuencia"))
+    })
+
+    #12. ¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?
+
+    ##SECTION G
+
+    output$servicio_importante <- renderPlotly({
+        ggplotly(
+            ggplot(encuesta_satisfaccion, aes(x = importante, y = oportunoPronto)) +
+            geom_line( color="grey") +
+            geom_point(shape=21, color="black", fill="#69b3a2", size=6) +
+            theme_ipsum()
         )
     })
 
-    output$satisfaccionxUtil <- renderPlotly({
-        encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
-        encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
+    ##SECTION F
 
-        respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
+    #7. ¿Cómo califica la vía de atención, se adaptó a sus necesidades? (La vía de atención se da por llamadas telefónicas, mensajes de texto y WhatsApp, presencial, etc.)
 
+    conteo_via_atencion <- encuesta_satisfaccion %>% count(viaAdapto)
+
+    output$via_atencion <- renderPlotly({
         ggplotly(
-        ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
-        geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-            xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            ggplot(conteo_via_atencion, aes(x = viaAdapto, y = n, fill = viaAdapto)) + 
+            geom_bar(stat = "identity") +
+            xlab("Calificación de la vía de atención") +
+            ylab("Frecuencia")
+        )
     })
 
+
+    #8. ¿Cómo califica la confianza y seguridad que le hicieron sentir durante la atención?
+
+    conteo_confianza_seguridad <- encuesta_satisfaccion %>% count(confianzaSeguridad)
+
+    output$calificacion_confianza_seguridad <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_confianza_seguridad, aes(x = confianzaSeguridad, y = n, fill = confianzaSeguridad)) +
+            geom_bar(stat = "identity") +
+            xlab("Calificación confianza y seguridad") +
+            ylab("Frecuencia")
+        )
+    })
+
+    #9. Califique por favor el respeto con el que sintió que fue tratada/o durante el Acompañamiento Emocional:
+
+    conteo_respeto <- encuesta_satisfaccion %>% count(respeto) 
+
+    output$respeto_sesiones <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_respeto, aes(x = respeto, y = n, fill = respeto)) +
+            geom_bar(stat = "identity") +
+            xlab("Respeto sentido en las sesiones de Acompañamiento Emocional") +
+            ylab("Frecuencia")
+        )
+    })
+
+    #13. ¿Qué tan satisfactorio fue el trato que le brindó el equipo de Acompañamiento Emocional de CIAM?
+
+    conteo_serv_satisfactorio <- encuesta_satisfaccion %>% count(satisfactorio)
+
+    output$serv_satisfactorio <- renderPlotly({
+        ggplotly(
+            ggplot(conteo_serv_satisfactorio, aes(x = satisfactorio, y = n, fill = satisfactorio)) +
+            geom_bar(stat = "identity") +
+            xlab("Trato satisfactorio brindado") +
+            ylab("Frecuencia")
+        )
+    })
+
+
 }
+   
+
+
+
+
+
+
+
