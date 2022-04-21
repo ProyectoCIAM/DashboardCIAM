@@ -5,7 +5,6 @@ library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
 library(httr)
-
     
 
 server <- function(input, output, session) { 
@@ -607,37 +606,45 @@ output$misma_dir_agresor_victima <- renderPlotly({
 
     ##SECCION D
 
-        output$satisfaccionxServicio <- renderPlotly({
-            califxServicio <- encuesta_satisfaccion %>% group_by(institucion) %>%
-                summarize(promedio = round(mean(as.numeric(calificacionServicios)), 2)) %>%
-                arrange(desc(promedio)) %>%
-                mutate(institucion = factor(institucion, levels = institucion))
+    output$satisfaccionxServicio <- renderPlotly({
+        colnames(instancia)[2] <- "institucion"
+        colnames(encuesta_satisfaccion)[24] <- "id_instancia"
+        
+        instancia_new <- instancia %>% group_by(id_instancia) %>% slice(1)
+        
+        satisfaccion_data <- merge(encuesta_satisfaccion, instancia_new, by="id_instancia")
+        califxServicio <- satisfaccion_data %>% group_by(institucion) %>%
+            summarize(promedio = round(mean(as.numeric(calificacionInstancia)), 2)) %>%
+            arrange(desc(promedio)) %>%
+            mutate(institucion = factor(institucion, levels = institucion))
 
-            colnames(califxServicio)[1] <- "institucion"
+        colnames(califxServicio)[1] <- "institucion"
 
-            respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
+        respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
 
-            ggplotly(
-            ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
-            geom_bar(stat="identity") + 
-                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-                xlab("Instituciones")
-            )
-        })
+        ggplotly(
+        ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
+        geom_bar(stat="identity") + 
+        theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+        xlab("Instituciones")+
+        ylab("Promedio de calificación")+
+        coord_flip()
+        )
+    })
 
-        output$satisfaccionxUtil <- renderPlotly({
-            encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
-            encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
+    output$satisfaccionxUtil <- renderPlotly({
+        encuesta_satisfaccion_Util_si <- sum(!is.na(encuesta_satisfaccion$siutil))
+        encuesta_satisfaccion_Util_no <- sum(!is.na(encuesta_satisfaccion$noutil))
 
-            respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
+        respuestas_Util <- data.frame(Util = c("Si", "No"), value = c(encuesta_satisfaccion_Util_si, encuesta_satisfaccion_Util_no))
 
-            ggplotly(
-            ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
-            geom_bar(stat="identity") + 
-                theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-                xlab("Respuesta")+
-                scale_fill_manual(values=c('#56267d', '#2AB7CD')))
-        })
+        ggplotly(
+        ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
+        geom_bar(stat="identity") + 
+            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            xlab("Respuesta")+
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+    })
 
 
     ##SECTION F
