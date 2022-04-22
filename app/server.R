@@ -544,9 +544,21 @@ server <- function(input, output, session) {
 
     colnames(sexos)[2] <- "sexos_agresor_catalogo"
 
-    ### conteo de los datos de las columnas edad_agresor y id_sexo
-    conteo_edades_agresor <- riesgos %>% count(edad_agresor)
+    ## obtener rangos de edades de los agresores
+    riesgos$edad_agresor <- as.numeric(riesgos$edad_agresor)
 
+    rango_edades_agresor <- cut(riesgos$edad_agresor, c(15,19,20,29,30,39,40,49,50,59,60, Inf, c("15-19","20-29","30-39","40-49","50-59",">60")),right = TRUE)   
+
+    ## añadir los rangos de edades de los agresores a la tabla riesgos
+    riesgos$rango_edades_agresor <- rango_edades_agresor
+
+    #filtrado de NAs
+    edadesAgresor <- riesgos %>% select(rango_edades_agresor) %>%
+    filter(!is.na(rango_edades_agresor))
+
+    rangos_edades_agresor <- edadesAgresor %>% group_by(rango_edades_agresor) %>% summarise(n = n())
+
+    ### conteo de los datos de la columna id_sexo
     conteo_sexos_agresor <- riesgos %>% count(id_sexo)
 
     ### unión de las tablas riesgos y sexos por el campo id_sexo
@@ -555,7 +567,7 @@ server <- function(input, output, session) {
     ### gráfica de edad del agresor
     output$edades_agresor_grf <- renderPlotly({
         ggplotly(
-            ggplot(conteo_edades_agresor, aes(x = edad_agresor, y = n, fill = edad_agresor)) +
+            ggplot(rangos_edades_agresor, aes(x = rango_edades_agresor, y = n, fill = rango_edades_agresor)) +
             geom_bar(stat = "identity") +
             xlab("Edad Agresor") +
             ylab("Frecuencia"))
