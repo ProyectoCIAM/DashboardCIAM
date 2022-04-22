@@ -167,9 +167,26 @@ body <- dashboardBody(
       ),
      ),
     ############   TABS  DASHBOARD 3
-     tabItem("instalaciones", h2("Calificación de las instalaciones")),
-     tabItem("servicios", h2("Calificación de los servicios")),
-     tabItem("ucanalizacion", h2("Utilidad de la canalización")),
+     tabItem("instalaciones", h2("Calificación de las instalaciones"),
+      fluidRow(
+        box(title = "¿El servicio de Acompañamiento Emocional lo recibió de forma presencial (en las instalaciones de CIAM Cancún)?", width = 6, solidHeader = TRUE, plotlyOutput("presencial")),
+        box(title = "Califique por favor las instalaciones de CIAM Cancún", width = 6, solidHeader = TRUE, plotlyOutput("califInstalaciones"))
+      )),
+     tabItem("servicios", h2("Calificación de los servicios"),
+      fluidRow(
+        box(title = "¿Logró con el Acompañamiento Emocional los cambios que esperaba?", width = 6, header = TRUE, plotlyOutput("cambios")),
+        box(title = "¿Recurriría a nuestros servicios de acompañamiento emocional de nuevo?", width = 6, header = TRUE, plotlyOutput("serviciosDeNuevo")),
+        box(title = "¿Si requiriera de nueva cuenta los servicios de Acompañamiento Emocional de CIAM, le gustaría que le atendiera el mismo/a psicoterapeuta?", width = 6, header = TRUE, plotlyOutput("mismoPsico")),
+        box(title = "¿Recomendaría nuestros servicios a otras personas?", width = 6, header = TRUE, plotlyOutput("recomendacion"))
+      )
+     ),
+     tabItem("ucanalizacion", h2("Utilidad de la canalización"),
+      fluidRow(
+        box(title = "¿Fue canalizada/o por parte de CIAM a alguna otra institución?", width = 4, header = TRUE, plotlyOutput("canalizado")),
+        box(title = "Edades de canalizadas/os", width = 4, header = TRUE, plotlyOutput("edadesCanalizados")),
+        box(title = "Identidad sexogenérica de canalizadas/os", width = 4, header = TRUE, plotlyOutput("sexoCanalizados")),
+        box(title = "¿A cuál institución?", width = 12, header = TRUE, plotlyOutput("frecInstanciasCanalizadas"))
+      )),
      tabItem("sexterno", h2("Calificación del servicio externo"),
       fluidRow(
         box(

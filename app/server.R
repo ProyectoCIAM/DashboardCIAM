@@ -601,8 +601,203 @@ output$misma_dir_agresor_victima <- renderPlotly({
     ########################        DASHBOARD 3
 
     ##SECTION A
+
+    # Presencial?
+    sipresencial <- sum(!is.na(encuesta_satisfaccion$sipresencial))
+    nopresencial <- sum(!is.na(encuesta_satisfaccion$nopresencial))
+
+    presencial <- data.frame(category = c("Si", "No"), value = c(sipresencial, nopresencial))
+
+    output$presencial <- renderPlotly({ggplotly(
+        ggplot(presencial, aes(x=category, y=value, fill = category)) +
+            geom_bar(stat="identity") + 
+            theme(axis.text.x = element_blank()) +
+            xlab(element_blank()) +
+            ylab("Frecuencia") +
+            labs(fill = "Categoría"))})
+    
+    # calificacion instalaciones
+
+    calif_instalaciones <- encuesta_satisfaccion %>% group_by(instalaciones) %>%
+        filter(!is.na(instalaciones)) %>% summarize(n=n())
+
+    output$califInstalaciones<- renderPlotly({ggplotly(
+        ggplot(calif_instalaciones, aes(x = instalaciones, y = n, fill = instalaciones)) +
+            geom_bar(stat = "identity") +
+            theme(axis.text.x = element_blank()) +
+            xlab(element_blank()) +
+            ylab("Frecuencia") +
+            labs(fill = "Calificación"))})
+
     ##SECTION B
+
+    servicio <- encuesta_satisfaccion[,c("sicambios","nocambios","siservicios","noservicios","siMismoPsico","noMismoPsico","sirecomendacion","norecomendacion")]
+    
+    # cambios
+
+    sicambios <- servicio %>% select(sicambios) %>% 
+        filter(!is.na(sicambios)) %>%
+        summarise(si = n())
+
+    nocambios <- servicio %>% select(nocambios) %>% 
+        filter(!is.na(nocambios)) %>%
+        summarise(no = n())
+
+    cambios <- t(bind_cols(sicambios,nocambios))
+    colnames(cambios) <- "n"
+    cambios <- cbind("Cambios"=rownames(cambios), data.frame(cambios, row.names=NULL))
+
+    output$cambios <- renderPlotly({ggplotly(
+        ggplot(cambios, aes(x = Cambios, y = n, fill = Cambios)) +
+            geom_bar(stat = "identity") +
+            theme(axis.text.x = element_blank()) +
+            xlab(element_blank()) +
+            ylab("Frecuencia")
+    )}) 
+
+    # recurriria de nuevo a nuestros servicios?
+    siservicios <- servicio %>% select(siservicios) %>% 
+        filter(!is.na(siservicios)) %>%
+        summarise(si = n())
+
+    noservicios <- servicio %>% select(noservicios) %>% 
+        filter(!is.na(noservicios)) %>%
+        summarise(no = n())
+
+    recur_serv <- t(bind_cols(siservicios,noservicios))
+    colnames(recur_serv) <- "n"
+    recur_serv <- cbind("Recurriria"=rownames(recur_serv), data.frame(recur_serv, row.names=NULL))
+
+    output$serviciosDeNuevo <- renderPlotly({
+        ggplotly(
+            ggplot(recur_serv, aes(x = Recurriria, y = n, fill = Recurriria)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia"))})
+    
+    # mismo psico de nuevo?
+    siMismoPsico <- servicio %>% select(siMismoPsico) %>% 
+        filter(!is.na(siMismoPsico)) %>%
+        summarise(si = n())
+
+    noMismoPsico <- servicio %>% select(noMismoPsico) %>% 
+        filter(!is.na(noMismoPsico)) %>%
+        summarise(no = n())
+
+    mismoPsico <- t(bind_cols(siMismoPsico,noMismoPsico))
+    colnames(mismoPsico) <- "n"
+    mismoPsico <- cbind("Mismo"=rownames(mismoPsico), data.frame(mismoPsico, row.names=NULL))
+
+    output$mismoPsico <- renderPlotly({
+        ggplotly(
+            ggplot(mismoPsico, aes(x = Mismo, y = n, fill = Mismo)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia"))})
+
+    # recomendaria servicios
+    sirecomendacion <- servicio %>% select(sirecomendacion) %>% 
+        filter(!is.na(sirecomendacion)) %>%
+        summarise(si = n())
+
+    norecomendacion <- servicio %>% select(norecomendacion) %>% 
+        filter(!is.na(norecomendacion)) %>%
+        summarise(no = n())
+
+    recomendacion <- t(bind_cols(sirecomendacion,norecomendacion))
+    colnames(recomendacion) <- "n"
+    recomendacion <- cbind("Recomendaria"=rownames(recomendacion), data.frame(recomendacion, row.names=NULL))
+
+    output$recomendacion <- renderPlotly({
+        ggplotly(
+            ggplot(recomendacion, aes(x = Recomendaria, y = n, fill = Recomendaria)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia"))})
+    
     ##SECTION C
+
+    # fue canalizado? Edad, sexo, a que institucion
+    canalizaciones <- encuesta_satisfaccion[,c("sicanalizado","nocanalizado","institucion")]
+
+    #fue canalizado?
+    sicanalizado <- canalizaciones %>% select(sicanalizado) %>% 
+        filter(!is.na(sicanalizado)) %>% summarise(si=n())
+    nocanalizado <- canalizaciones %>% select(nocanalizado) %>%
+        filter(!is.na(nocanalizado)) %>% summarise(no=n())
+
+    canalizado <- t(bind_cols(sicanalizado,nocanalizado))
+    colnames(canalizado) <- "n"
+    canalizado <- cbind("Canalizado"=rownames(canalizado), data.frame(canalizado, row.names=NULL))
+
+    output$canalizado <- renderPlotly({
+        ggplotly(
+            ggplot(canalizado, aes(x = Canalizado, y = n, fill = Canalizado)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia"))})
+
+    # edad
+    #convertimos a enteros
+    encuesta_satisfaccion$edad <- as.numeric(encuesta_satisfaccion$edad)
+
+    #obtenemos rangos
+    rango_edades <- cut(encuesta_satisfaccion$edad, breaks = c(-1,5,12,18,25,29,59,Inf), labels = c("0 a 5","6 a 12","13 a 18","19 a 25","26 a 29","30 a 59","más de 60"))
+    encuesta_satisfaccion$rango_edades <- rango_edades
+    #obtenemos sexo (para siguiente gráfica)
+    sexoPersonas <- personas[,c("id_folio","sexoPersona")]
+    encuesta_satisfaccion <- left_join(x = encuesta_satisfaccion, y = sexoPersonas, by = "id_folio")
+    # filtramos los que fueron canalizados
+    personasCanalizadas <- encuesta_satisfaccion %>% filter(sicanalizado==1)
+    # filtramos nas
+    edadesPersonas <- personasCanalizadas %>% select(rango_edades) %>% filter(!is.na(rango_edades))
+
+    rangos_edades <- edadesPersonas %>% group_by(rango_edades) %>% summarise(n = n())
+
+    output$edadesCanalizados <- renderPlotly({
+        ggplotly(
+            ggplot(rangos_edades, aes(x = rango_edades, y = n, fill = rango_edades)) + 
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia") +
+                labs(fill = "Rango edades"))})
+
+    # sexo
+    sexosPersonaS <- personasCanalizadas %>% group_by(sexoPersona) %>% filter(!is.na(sexoPersona)) %>%
+    summarise(n = n())
+    colnames(sexosPersonaS)[1] <- "id_sexo"
+    colnames(sexos)[2] <- "Sexo"
+    sexosPersonaS <- merge(sexosPersonaS,sexos)
+
+    output$sexoCanalizados <- renderPlotly({
+        ggplotly(
+            ggplot(sexosPersonaS, aes(x = Sexo, y = n, fill = Sexo)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia"))})
+
+    
+    # frecuencia de canalizacion a instancias
+    count_intancias <- personasCanalizadas %>% group_by(institucion) %>% summarise(n = n())
+    colnames(count_intancias)[1] <- "id_instancia"
+
+    count_instancias <- merge(count_intancias,instancia)
+    colnames(count_instancias)[3] <- "nomInstancia"
+
+    output$frecInstanciasCanalizadas <- renderPlotly({
+        ggplotly(
+            ggplot(count_instancias, aes(x = nomInstancia, y = n, fill = nomInstancia)) +
+                geom_bar(stat = "identity") +
+                theme(axis.text.x = element_blank()) +
+                xlab(element_blank()) +
+                ylab("Frecuencia") +
+                labs(fill = "Instancia"))})
 
     ##SECCION D
 
