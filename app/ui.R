@@ -83,11 +83,11 @@ body <- dashboardBody(
      tabItem("violencia", h2("Tipos de violencia experimentada"),
       fluidRow(
         box(
-          title = "Tipos de Violencia Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          title = "¿Qué tipos de violencia ha experimentado?", width = 6, solidHeader = TRUE,
           plotlyOutput("hist_tipo_violencia_anterior")
         ),
         box(
-          title = "Modalidad Experimentada ANTERIORMENTE", width = 6, solidHeader = TRUE,
+          title = "Modalidad", width = 6, solidHeader = TRUE,
           plotlyOutput("hist_modalidad_anterior")
         ),
         box(
@@ -98,11 +98,11 @@ body <- dashboardBody(
      tabItem("vactuales", h2("Tipos de violencia actuales"),
       fluidRow(
         box(
-          title = "Tipos de Violencia Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          title = "¿Qué tipos de violencia experimenta actualmente?", width = 6, solidHeader = TRUE,
           plotlyOutput("hist_tipo_violencia_actual")
         ),
         box(
-          title = "Modalidad Experimentada ACTUAL", width = 6, solidHeader = TRUE,
+          title = "Modalidad", width = 6, solidHeader = TRUE,
           plotlyOutput("hist_modalidad_actual")
         ),
         box(
@@ -182,9 +182,12 @@ body <- dashboardBody(
      ),
      tabItem("ucanalizacion", h2("Utilidad de la canalización"),
       fluidRow(
-        box(title = "¿Fue canalizada/o por parte de CIAM a alguna otra institución?", width = 4, header = TRUE, plotlyOutput("canalizado")),
-        box(title = "Edades de canalizadas/os", width = 4, header = TRUE, plotlyOutput("edadesCanalizados")),
-        box(title = "Identidad sexogenérica de canalizadas/os", width = 4, header = TRUE, plotlyOutput("sexoCanalizados")),
+        box(title = "¿Fue canalizada/o por parte de CIAM a alguna otra institución?", width = 6, header = TRUE, plotlyOutput("canalizado")),
+        tabBox(
+          width = 6, 
+          tabPanel("Edad", "Edades de canalizadas/os", plotlyOutput("edadesCanalizados")),
+          tabPanel("Sexo", "Identidad sexogenérica de canalizadas/os", plotlyOutput("sexoCanalizados"))
+        ),
         box(title = "¿A cuál institución?", width = 12, header = TRUE, plotlyOutput("frecInstanciasCanalizadas"))
       )),
      tabItem("sexterno", h2("Calificación del servicio externo"),

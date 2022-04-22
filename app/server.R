@@ -259,12 +259,12 @@ server <- function(input, output, session) {
         califxinstancia$calificacion <- as.numeric(califxinstancia$calificacion)
         
         califpromxinstancia <- califxinstancia %>% group_by(instancia) %>%
-            summarize(promedio = round(mean(calificacion), 2)) %>%
+            summarize(promedio = round(mean(calificacion), 2), Conteo = n(), Min = min(calificacion), Max = max(calificacion)) %>%
             arrange(desc(promedio)) %>%
             mutate(instancia = factor(instancia, levels = instancia))
         # graficamos
         ggplotly(ggplot(califpromxinstancia, aes(x = instancia, y = promedio, fill = instancia)) +
-            geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Promedio: %s", instancia, promedio))) +
+            geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Promedio: %s<br>Conteo: %s<br>Calificación mínima: %s<br>Calificación máxima: %s", instancia, promedio, Conteo, Min, Max))) +
             theme(axis.title.x = element_blank(),
                 axis.text.x = element_blank(),
                 axis.ticks.x = element_blank()),tooltip="text")
@@ -290,11 +290,11 @@ server <- function(input, output, session) {
     tipo_violencia_experimentada <- merge(tipo_violencia_experimentada,tipo_violencia)
     modalidad_experimentada <- merge(modalidad_experimentada,modalidad)
 
-    count_tv_vs_m <- violencia_experimentada %>% group_by(id_tipo_violencia,id_modalidad) %>%
-        summarize(n = n())
+    count_tv_vs_m <- violencia_experimentada %>% group_by(id_tipo_violencia,id_modalidad) %>% 
+        mutate(n = n())
 
-    tv_vs_m <- merge(count_tv_vs_m,tipo_violencia)
-    tv_vs_m <- merge(tv_vs_m,modalidad)
+    tv_vs_m <- merge(count_tv_vs_m, tipo_violencia)
+    tv_vs_m <- merge(tv_vs_m, modalidad)
 
     # histgrama de tipos de violencia
     output$hist_tipo_violencia_anterior <- renderPlotly({
@@ -302,7 +302,10 @@ server <- function(input, output, session) {
             ggplot(tipo_violencia_experimentada, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
             geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
             xlab("Tipos de Violencia") +
-            ylab("Frecuencia"),tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""), tooltip = "text")
     })
 
     # histograma de modalidad
@@ -311,16 +314,20 @@ server <- function(input, output, session) {
             ggplot(modalidad_experimentada, aes(x = modalidad ,y = n, fill = modalidad)) +
             geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
             xlab("Modalidad") +
-            ylab("Frecuencia"), tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""), tooltip = "text")
     })
 
     # histograma combinado violencia vs modalidad
     output$hist_tipo_vs_modalidad_anterior <- renderPlotly({
         ggplotly(
-            ggplot(tv_vs_m, aes(x = tipo_violencia, y = n, fill = modalidad)) +
-            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            ggplot(tv_vs_m, aes(x = tipo_violencia, fill = modalidad)) +
+            geom_bar(position="dodge", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
-            ylab("Frecuencia"), tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
 
     ## SECTION B
@@ -337,7 +344,7 @@ server <- function(input, output, session) {
     modalidad_actual <- merge(modalidad_actual,modalidad)
 
     count_tv_vs_m_actual <- violencia_actual %>% group_by(id_tipo_violencia,id_modalidad) %>%
-        summarize(n = n())
+        mutate(n = n())
 
     tv_vs_m_actual <- merge(count_tv_vs_m_actual,tipo_violencia)
     tv_vs_m_actual <- merge(tv_vs_m_actual,modalidad)
@@ -349,7 +356,10 @@ server <- function(input, output, session) {
             ggplot(tipo_violencia_actual, aes(x = tipo_violencia ,y = n, fill = tipo_violencia)) +
             geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
             xlab("Tipos de Violencia") +
-            ylab("Frecuencia"),tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""), tooltip = "text")
     })
 
     # histograma de modalidad
@@ -358,16 +368,20 @@ server <- function(input, output, session) {
             ggplot(modalidad_actual, aes(x = modalidad ,y = n, fill = modalidad)) +
             geom_bar(stat="identity", aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
             xlab("Modalidad") +
-            ylab("Frecuencia"), tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""), tooltip = "text")
     })
 
     # histograma combinado violencia vs modalidad
     output$hist_tipo_vs_modalidad_actual <- renderPlotly({
         ggplotly(
-            ggplot(tv_vs_m_actual, aes(x = tipo_violencia, y = n, fill = modalidad)) +
-            geom_bar(stat="identity", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            ggplot(tv_vs_m_actual, aes(x = tipo_violencia, fill = modalidad)) +
+            geom_bar(position="dodge", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
-            ylab("Frecuencia"), tooltip="text")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
 
     ## SECTION C
@@ -608,26 +622,28 @@ output$misma_dir_agresor_victima <- renderPlotly({
 
     presencial <- data.frame(category = c("Si", "No"), value = c(sipresencial, nopresencial))
 
-    output$presencial <- renderPlotly({ggplotly(
-        ggplot(presencial, aes(x=category, y=value, fill = category)) +
-            geom_bar(stat="identity") + 
-            theme(axis.text.x = element_blank()) +
-            xlab(element_blank()) +
-            ylab("Frecuencia") +
-            labs(fill = "Categoría"))})
+    output$presencial <- renderPlotly({
+        ggplotly(
+            ggplot(presencial, aes(x=category, y=value, fill = category)) +
+                geom_bar(stat="identity", aes(text=sprintf("Presencial: %s<br>Frecuencia: %s", category, value))) + 
+                xlab("Presencial") +
+                ylab("Frecuencia") +
+                theme(legend.position = "none"), tooltip = "text")
+    })
     
     # calificacion instalaciones
 
     calif_instalaciones <- encuesta_satisfaccion %>% group_by(instalaciones) %>%
         filter(!is.na(instalaciones)) %>% summarize(n=n())
 
-    output$califInstalaciones<- renderPlotly({ggplotly(
-        ggplot(calif_instalaciones, aes(x = instalaciones, y = n, fill = instalaciones)) +
-            geom_bar(stat = "identity") +
-            theme(axis.text.x = element_blank()) +
-            xlab(element_blank()) +
-            ylab("Frecuencia") +
-            labs(fill = "Calificación"))})
+    output$califInstalaciones<- renderPlotly({
+        ggplotly(
+            ggplot(calif_instalaciones, aes(x = instalaciones, y = n, fill = instalaciones)) +
+                geom_bar(stat = "identity", aes(text=sprintf("Calificación: %s<br>Frecuencia: %s", instalaciones, n))) +
+                xlab("Calificación") +
+                ylab("Frecuencia") +
+                theme(legend.position = "none"), tooltip = "text")
+    })
 
     ##SECTION B
 
@@ -647,13 +663,14 @@ output$misma_dir_agresor_victima <- renderPlotly({
     colnames(cambios) <- "n"
     cambios <- cbind("Cambios"=rownames(cambios), data.frame(cambios, row.names=NULL))
 
-    output$cambios <- renderPlotly({ggplotly(
-        ggplot(cambios, aes(x = Cambios, y = n, fill = Cambios)) +
-            geom_bar(stat = "identity") +
-            theme(axis.text.x = element_blank()) +
-            xlab(element_blank()) +
-            ylab("Frecuencia")
-    )}) 
+    output$cambios <- renderPlotly({
+        ggplotly(
+            ggplot(cambios, aes(x = Cambios, y = n, fill = Cambios)) +
+                geom_bar(stat = "identity", aes(text=sprintf("Cambios: %s<br>Frecuencia: %s", Cambios, n))) +
+                theme(legend.position = "none") +
+                xlab("Cambios") +
+                ylab("Frecuencia"), tooltip = "text")
+    }) 
 
     # recurriria de nuevo a nuestros servicios?
     siservicios <- servicio %>% select(siservicios) %>% 
@@ -671,10 +688,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$serviciosDeNuevo <- renderPlotly({
         ggplotly(
             ggplot(recur_serv, aes(x = Recurriria, y = n, fill = Recurriria)) +
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
-                ylab("Frecuencia"))})
+                geom_bar(stat = "identity", aes(text=sprintf("Recurriría: %s<br>Frecuencia: %s", Recurriria, n))) +
+                theme(legend.position = "none") +
+                xlab("Recurriría") +
+                ylab("Frecuencia"), tooltip = "text")
+    })
     
     # mismo psico de nuevo?
     siMismoPsico <- servicio %>% select(siMismoPsico) %>% 
@@ -692,10 +710,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$mismoPsico <- renderPlotly({
         ggplotly(
             ggplot(mismoPsico, aes(x = Mismo, y = n, fill = Mismo)) +
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
-                ylab("Frecuencia"))})
+                geom_bar(stat = "identity", aes(text=sprintf("Mimso Psicoterapeuta: %s<br>Frecuencia: %s", Mismo, n))) +
+                theme(legend.position = "none") +
+                xlab("Mismo psicoterapeuta") +
+                ylab("Frecuencia"), tooltip = "text")
+    })
 
     # recomendaria servicios
     sirecomendacion <- servicio %>% select(sirecomendacion) %>% 
@@ -713,10 +732,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$recomendacion <- renderPlotly({
         ggplotly(
             ggplot(recomendacion, aes(x = Recomendaria, y = n, fill = Recomendaria)) +
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
-                ylab("Frecuencia"))})
+                geom_bar(stat = "identity", aes(text=sprintf("Recomendaría: %s<br>Frecuencia: %s",Recomendaria,n))) +
+                theme(legend.position = "none") +
+                xlab("Recomendaría") +
+                ylab("Frecuencia"), tooltip = "text")
+    })
     
     ##SECTION C
 
@@ -736,10 +756,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$canalizado <- renderPlotly({
         ggplotly(
             ggplot(canalizado, aes(x = Canalizado, y = n, fill = Canalizado)) +
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
-                ylab("Frecuencia"))})
+                geom_bar(stat = "identity", aes(text=sprintf("Canalizado: %s<br>Frecuencia: %s",Canalizado,n))) +
+                theme(legend.position = "none") +
+                xlab("Canalizado") +
+                ylab("Frecuencia"), tooltip = "text")
+    })
 
     # edad
     #convertimos a enteros
@@ -761,11 +782,12 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$edadesCanalizados <- renderPlotly({
         ggplotly(
             ggplot(rangos_edades, aes(x = rango_edades, y = n, fill = rango_edades)) + 
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
+                geom_bar(stat = "identity", aes(text=sprintf("Edad: %s<br>Frecuencia: %s",rango_edades,n))) +
+                theme(legend.position = "none") +
+                xlab("Edad") +
                 ylab("Frecuencia") +
-                labs(fill = "Rango edades"))})
+                labs(fill = "Rango edades"), tooltip = "text")
+    })
 
     # sexo
     sexosPersonaS <- personasCanalizadas %>% group_by(sexoPersona) %>% filter(!is.na(sexoPersona)) %>%
@@ -777,10 +799,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$sexoCanalizados <- renderPlotly({
         ggplotly(
             ggplot(sexosPersonaS, aes(x = Sexo, y = n, fill = Sexo)) +
-                geom_bar(stat = "identity") +
-                theme(axis.text.x = element_blank()) +
-                xlab(element_blank()) +
-                ylab("Frecuencia"))})
+                geom_bar(stat = "identity", aes(text=sprintf("Sexo: %s<br>Frecuencia: %s",Sexo,n))) +
+                theme(legend.position = "none") +
+                xlab("Sexo") +
+                ylab("Frecuencia"), tooltip = "text")
+    })
 
     
     # frecuencia de canalizacion a instancias
@@ -793,11 +816,12 @@ output$misma_dir_agresor_victima <- renderPlotly({
     output$frecInstanciasCanalizadas <- renderPlotly({
         ggplotly(
             ggplot(count_instancias, aes(x = nomInstancia, y = n, fill = nomInstancia)) +
-                geom_bar(stat = "identity") +
+                geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",nomInstancia,n))) +
                 theme(axis.text.x = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
-                labs(fill = "Instancia"))})
+                labs(fill = "Instancia"), tooltip = "text")
+    })
 
     ##SECCION D
 
