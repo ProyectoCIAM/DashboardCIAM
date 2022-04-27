@@ -9,7 +9,7 @@ library(httr)
 
 server <- function(input, output, session) { 
     # llamada tablas
-    #base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    # base_url <- "http://127.0.0.1:8000/api/" # url raiz
     base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
@@ -936,7 +936,39 @@ output$misma_dir_agresor_victima <- renderPlotly({
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
+    ##SECTION E
+    output$sesionesxEdades <- renderPlotly({
+        enc_age <- encuesta_satisfaccion %>% group_by(id_cantidad_sesiones,rango_edades) %>%
+        mutate(n = n())
+        ggplotly(
+            ggplot(enc_age, aes(x = id_cantidad_sesiones, fill = rango_edades)) +
+            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", id_cantidad_sesiones, rango_edades, n))) + 
+            theme(legend.position = "none") +
+            xlab("") +
+            ylab("Cantidad") +
+            theme(axis.ticks.x = element_blank()), tooltip = "text")
+    })
 
+    output$sesionesxSexo <- renderPlotly({
+        print(length(colnames(encuesta_satisfaccion)))
+
+        colnames(sexos)[2] <- "sexoPersona"
+        colnames(encuesta_satisfaccion)[30] <- "id_sexo"
+        sexo <- sexos %>% group_by(id_sexo) %>% slice(1)
+        encuenta_new_data <- merge(encuesta_satisfaccion, sexo, by="id_sexo")
+        encuenta_new_data <- merge(encuesta_satisfaccion, sexo, by="id_sexo")
+
+        enc_actual <- encuenta_new_data %>% group_by(id_cantidad_sesiones,sexoPersona) %>%
+        mutate(n = n())
+
+        ggplotly(
+            ggplot(enc_actual, aes(x = id_cantidad_sesiones, fill = sexoPersona)) +
+            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", id_cantidad_sesiones, sexoPersona, n))) + 
+            theme(legend.position = "none") +
+            xlab("") +
+            ylab("Cantidad") +
+            theme(axis.ticks.x = element_blank()), tooltip = "text")
+    })
     ##SECTION F
 
     #Principal: 6. ¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?

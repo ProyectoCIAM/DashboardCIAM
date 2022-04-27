@@ -208,8 +208,15 @@ body <- dashboardBody(
         # ),
       )
      ),
-     tabItem("sesiones", h2("Número de sesiones por edad y sexo")),
-     tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
+    tabItem("sesiones", h2("Número de sesiones por edad y sexo"),
+    fluidRow(
+       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 4, solidHeader = TRUE,
+       plotlyOutput("sesionesxEdades")),
+       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 4, solidHeader = TRUE,
+       plotlyOutput("sesionesxSexo"))
+     ),
+    ),
+    tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
        box(title = "¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", width = 6, solidHeader = TRUE,
        plotlyOutput("si_servicio")),
 
