@@ -113,12 +113,14 @@ server <- function(input, output, session) {
 
     persona_solicita_servicio <- data.frame(category = c("Si", "No"), value = c(persona_requiere_servicio_count, persona_otra_requiere_servicio_count))
 
-    output$persona_servicio <- renderPlotly({ggplotly(
+    output$persona_servicio <- renderPlotly({
+        ggplotly(
         ggplot(persona_solicita_servicio, aes(x=category, y=value, fill = category)) +
         geom_bar(stat="identity") + 
             theme(axis.text.x = element_text(angle = 60, hjust=1)) +
             xlab("Categoría") +
-            ylab("Frecuencia"))
+            ylab("Frecuencia") +
+            theme(legend.position = "none"), tooltip = "text")
 
     })
 
@@ -137,9 +139,11 @@ server <- function(input, output, session) {
     ggplotly(
         ggplot(servicio_acomp_emocional_data, aes(x=como_se_entero, y=n, fill = como_se_entero)) + 
         geom_bar(stat="identity", alpha=.6, width=.4) + 
-        theme(axis.text.x = element_text(angle = 60, hjust=1)) +
         xlab("Categoría") +
-        ylab("Frecuencia"))
+        ylab("Frecuencia") +
+        theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
 
@@ -155,9 +159,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_anterior, aes(x=Anterior, y=value, fill = Anterior)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) + 
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxSeguimiento <- renderPlotly({
@@ -169,9 +175,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Seguimiento, aes(x=Seguimiento, y=value, fill = Seguimiento)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxAdecuado <- renderPlotly({
@@ -183,9 +191,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Adecuado, aes(x=Adecuado, y=value, fill = Adecuado)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxOportuno <- renderPlotly({
@@ -197,9 +207,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Oportuno, aes(x=Oportuno, y=value, fill = Oportuno)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxProntitud <- renderPlotly({
@@ -211,9 +223,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Prontitud, aes(x=Prontitud, y=value, fill = Prontitud)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxConfianza <- renderPlotly({
@@ -225,9 +239,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Confianza, aes(x=Confianza, y=value, fill = Confianza)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$canalizacionxRespeto <- renderPlotly({
@@ -239,9 +255,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Respeto, aes(x=Respeto, y=value, fill = Respeto)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
 
@@ -408,9 +426,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_LGBT, aes(x=LGBT, y=value, fill = LGBT)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
-            scale_fill_manual(values=c('#56267d', '#2AB7CD')))
+            scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     output$personasxSexo <- renderPlotly({
@@ -427,8 +447,10 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Sexo, aes(x=Sexo, y=value, fill = Sexo)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-            xlab("Identidad")
+            xlab("Identidad") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -441,9 +463,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Localidad, aes(x=Localidad, y=value, fill = Localidad)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-            xlab("Localidades")+
-            coord_flip()
+            xlab("Localidades") +
+            coord_flip() +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -456,9 +480,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Estado, aes(x=Estado, y=value, fill = Estado)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Estados")+
-            coord_flip()
+            coord_flip() +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -471,9 +497,11 @@ server <- function(input, output, session) {
         ggplotly(
         ggplot(respuestas_Pais, aes(x=Pais, y=value, fill = Pais)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Localidades")+
-            coord_flip()
+            coord_flip() +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -530,9 +558,11 @@ server <- function(input, output, session) {
         ggplotly(
             ggplot(respuestas_Tipo_Servicio, aes(x=Tipo_Servicio, y=value, fill = Tipo_Servicio)) +
             geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 60, hjust=1)) +
-            ylab("Personas")+
-            xlab("Servicios")
+            ylab("Personas") +
+            xlab("Servicios") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
     
@@ -570,7 +600,10 @@ server <- function(input, output, session) {
             ggplot(rangos_edades_agresor, aes(x = rango_edades_agresor, y = n, fill = rango_edades_agresor)) +
             geom_bar(stat = "identity") +
             xlab("Edad Agresor") +
-            ylab("Frecuencia"))
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
     })
 
     ### gráfica de sexo del agresor
@@ -579,7 +612,10 @@ server <- function(input, output, session) {
             ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
             geom_bar(stat = "identity") + 
             xlab("Sexo del Agresor") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -599,7 +635,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
         ggplot(count_total,aes(x=Misma_direccion, y=n, fill=Misma_direccion)) +
             geom_bar(stat = "identity") +
             xlab("Misma dirección del agresor de quien solicita el servicio") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") + 
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
     )
 })
 
@@ -618,7 +657,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ggplot(total_red_apoyo, aes(x=Red_apoyo, y = n, fill=Red_apoyo)) +
             geom_bar(stat = "identity") +
             xlab("Red apoyo agresor") +
-            ylab("frecuencia")
+            ylab("frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -889,7 +931,11 @@ output$misma_dir_agresor_victima <- renderPlotly({
         ggplot(conteo_si_servicio, aes(x = siservicios, y = n, fill = siservicios)) +
             geom_bar(stat = "identity") +
             xlab("Recibieron servicio de acompañamiento emocional") +
-            ylab("Frecuencia"))
+            ylab("Frecuencia") + 
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = ""))
+
     })
 
     #12. ¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?
@@ -916,7 +962,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ggplot(conteo_via_atencion, aes(x = viaAdapto, y = n, fill = viaAdapto)) + 
             geom_bar(stat = "identity") +
             xlab("Calificación de la vía de atención") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") +
+             theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -930,7 +979,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ggplot(conteo_confianza_seguridad, aes(x = confianzaSeguridad, y = n, fill = confianzaSeguridad)) +
             geom_bar(stat = "identity") +
             xlab("Calificación confianza y seguridad") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") +
+             theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -943,7 +995,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ggplot(conteo_respeto, aes(x = respeto, y = n, fill = respeto)) +
             geom_bar(stat = "identity") +
             xlab("Respeto sentido en las sesiones de Acompañamiento Emocional") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") +
+             theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
@@ -956,7 +1011,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
             ggplot(conteo_serv_satisfactorio, aes(x = satisfactorio, y = n, fill = satisfactorio)) +
             geom_bar(stat = "identity") +
             xlab("Trato satisfactorio brindado") +
-            ylab("Frecuencia")
+            ylab("Frecuencia") +
+            theme(axis.ticks.x = element_blank(),
+            axis.text.x = element_blank()) +
+            labs(fill = "")
         )
     })
 
