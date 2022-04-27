@@ -77,7 +77,7 @@ body <- dashboardBody(
 
      tabItem("instancias", h2("Calificaciones por instancia"),
       mainPanel(
-        plotlyOutput("calificacionesxinstancia")
+        "En general, ¿cómo calificaría la calidad de la atención recibida en esa instancia, del 1 al 10, siendo 1 una calificación muy mala y 10 muy buena?", plotlyOutput("calificacionesxinstancia")
         )),
     ############   TABS  DASHBOARD 2
      tabItem("violencia", h2("Tipos de violencia experimentada"),
