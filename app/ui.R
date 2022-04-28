@@ -7,7 +7,7 @@ header <- dashboardHeader(title = "Dashboard CIAM")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     dateRangeInput('dateRange', label = 'Filtro por fechas: yyyy-mm-dd',
-      start = Sys.Date() - 30, end = Sys.Date()
+      start = Sys.Date() - 365, end = Sys.Date()
     ),
     menuItem("Tablero de Canalización", icon = icon("dashboard"), startExpanded = TRUE, 
       menuSubItem("Contacto", tabName = "contacto"),
