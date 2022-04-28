@@ -4,7 +4,6 @@ library(ggplot2)
 library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
-library(httr)
     
 
 server <- function(input, output, session) { 
@@ -24,16 +23,6 @@ server <- function(input, output, session) {
     full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
     full_url_modalidad <- base::paste0(base_url, "modalidad")
     full_url_encuesta_satisfaccion <- base::paste0(base_url, "satisfaccion")
-
-    #api call
-    api_call_folio <- httr::GET(full_url_folio)
-    api_call_medio_contacto <- httr::GET(full_url_medio_contacto)
-    api_call_persona <- httr::GET(full_url_persona)
-    api_call_como_se_entero_cat <- httr::GET(full_url_como_se_entero_cat)
-    api_call_riesgo <- httr::GET(full_url_riesgo)
-    api_call_sexos <- httr::GET(full_url_sexos)
-    api_call_encuesta_satisfaccion <- httr::GET(full_url_encuesta_satisfaccion)
-
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -445,6 +434,7 @@ server <- function(input, output, session) {
 
     ## SECTION C
     output$personasxEdad <- renderPlotly({
+        personas <- personasF()
         edad_rangos <- data.frame("rango_edades" = c("0 a 5","6 a 12","13 a 18","19 a 25","26 a 29","30 a 59","más de 60"))
         rango_edades <- cut(as.numeric(personas$edadPersona), breaks = c(-1,5,12,18,25,29,59,Inf), labels = edad_rangos$rango_edades)
         personas$rango_edades <- rango_edades
@@ -459,8 +449,8 @@ server <- function(input, output, session) {
         respuestas_Edad <- data.frame(Edad = c(countEdad$edad), Frecuencia = c(countEdad$n))
 
         ggplotly(
-        ggplot(respuestas_Edad, aes(x=Edad, y=Frecuencia, fill = Edad)) +
-        geom_bar(stat="identity") + 
+        ggplot(respuestas_Edad, aes(x=factor(Edad, levels = edad_rangos$rango_edades), y=Frecuencia)) +
+        geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Edad: %s<br>Frecuencia: %s",Edad,Frecuencia))) +
             theme(axis.text.x = element_text(angle = 0, hjust=1), legend.position = "none") +
             xlab("Rango de edades")+
             ylab("Frecuencia")+
