@@ -9,8 +9,8 @@ library(httr)
 
 server <- function(input, output, session) { 
     # llamada tablas
-    # base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")

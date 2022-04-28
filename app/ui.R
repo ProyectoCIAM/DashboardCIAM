@@ -193,7 +193,7 @@ body <- dashboardBody(
      tabItem("sexterno", h2("Calificación del servicio externo"),
       fluidRow(
         box(
-          title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 8, height = "75vh", solidHeader = TRUE,
+          title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 8, height = "50vh", solidHeader = TRUE,
           # tabBox(
           #   width = 12,
           #   tabPanel("¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", "", plotlyOutput("satisfaccionxServicio")),
@@ -203,7 +203,7 @@ body <- dashboardBody(
           plotlyOutput("satisfaccionxServicio")
         ),
         box(
-          title = "¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", width = 4, height = "75vh", solidHeader = TRUE,
+          title = "¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", width = 4, height = "50vh", solidHeader = TRUE,
           plotlyOutput("satisfaccionxUtil")
         ),
       )
