@@ -6,6 +6,9 @@ header <- dashboardHeader(title = "Dashboard CIAM")
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
+    dateRangeInput('dateRange', label = 'Filtro por fechas: yyyy-mm-dd',
+      start = Sys.Date() - 30, end = Sys.Date()
+    ),
     menuItem("Tablero de Canalización", icon = icon("dashboard"), startExpanded = TRUE, 
       menuSubItem("Contacto", tabName = "contacto"),
       menuSubItem("Canalización anterior", tabName = "canalizacion"),
@@ -244,5 +247,5 @@ dashboardPage(
   header,
   sidebar,
   body,
-  skin = "purple"
+  skin = 'purple'
 )
