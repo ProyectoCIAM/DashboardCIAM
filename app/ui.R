@@ -124,7 +124,7 @@ body <- dashboardBody(
           title = "Datos demográficos", width = 12, solidHeader = FALSE,
           tabBox(
             width = 12,
-            tabPanel("Personas LGBT", "", plotlyOutput("personasxLGBT")),
+            tabPanel("¿Pertenece a la comunidad LGBTTTQA+?", "", plotlyOutput("personasxLGBT")),
 
             tabPanel("Identidad sexogenerica", "", plotlyOutput("personasxSexo")),
 
@@ -193,26 +193,26 @@ body <- dashboardBody(
      tabItem("sexterno", h2("Calificación del servicio externo"),
       fluidRow(
         box(
-          title = "", width = 12, solidHeader = TRUE,
-          tabBox(
-            width = 12,
-            tabPanel("¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", "", plotlyOutput("satisfaccionxServicio")),
+          title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 8, height = "75vh", solidHeader = TRUE,
+          # tabBox(
+          #   width = 12,
+          #   tabPanel("¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", "", plotlyOutput("satisfaccionxServicio")),
 
-            tabPanel("¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", "", plotlyOutput("satisfaccionxUtil")),
-          ),
-          # plotlyOutput("satisfaccionxServicio")
+          #   tabPanel("¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", "", plotlyOutput("satisfaccionxUtil")),
+          # ),
+          plotlyOutput("satisfaccionxServicio")
         ),
-        # box(
-        #   title = "", width = 12, solidHeader = TRUE,
-        #   plotlyOutput("satisfaccionxUtil")
-        # ),
+        box(
+          title = "¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", width = 4, height = "75vh", solidHeader = TRUE,
+          plotlyOutput("satisfaccionxUtil")
+        ),
       )
      ),
     tabItem("sesiones", h2("Número de sesiones por edad y sexo"),
     fluidRow(
-       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 4, solidHeader = TRUE,
+       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 4, solidHeader = TRUE,
        plotlyOutput("sesionesxEdades")),
-       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 4, solidHeader = TRUE,
+       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por identidad sexogenérica)", width = 4, solidHeader = TRUE,
        plotlyOutput("sesionesxSexo"))
      ),
     ),

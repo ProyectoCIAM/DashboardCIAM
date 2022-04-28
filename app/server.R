@@ -412,16 +412,26 @@ server <- function(input, output, session) {
 
     ## SECTION C
     output$personasxEdad <- renderPlotly({
-        countEdad <- personas %>% count(personas$edadPersona)
+        edad_rangos <- data.frame("rango_edades" = c("0 a 5","6 a 12","13 a 18","19 a 25","26 a 29","30 a 59","más de 60"))
+        rango_edades <- cut(as.numeric(personas$edadPersona), breaks = c(-1,5,12,18,25,29,59,Inf), labels = edad_rangos$rango_edades)
+        personas$rango_edades <- rango_edades
+        countEdad <- personas %>% count(personas$rango_edades)
+        
+        colnames(countEdad)[1] <- "rango_edades"
+
+        countEdad <- left_join(edad_rangos,countEdad, by="rango_edades")
+        countEdad$n[is.na(countEdad$n)] <- 0
         colnames(countEdad)[1] <- "edad"
-        respuestas_Edad <- data.frame(Edad = c(countEdad$edad), value = c(countEdad$n))
+
+        respuestas_Edad <- data.frame(Edad = c(countEdad$edad), Frecuencia = c(countEdad$n))
 
         ggplotly(
-        ggplot(respuestas_Edad, aes(x=Edad, y=value, fill = Edad)) +
+        ggplot(respuestas_Edad, aes(x=Edad, y=Frecuencia, fill = Edad)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-            xlab("Edades")+
-            coord_flip()
+            theme(axis.text.x = element_text(angle = 0, hjust=1), legend.position = "none") +
+            xlab("Rango de edades")+
+            ylab("Frecuencia")+
+            labs(fill = "")
         )
     })
 
@@ -435,9 +445,9 @@ server <- function(input, output, session) {
         ggplot(respuestas_LGBT, aes(x=LGBT, y=value, fill = LGBT)) +
         geom_bar(stat="identity") + 
             xlab("Respuesta")+
+            ylab("Frecuencia")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')) +
-            theme(axis.ticks.x = element_blank(),
-            axis.text.x = element_blank()) +
+            theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
             labs(fill = ""))
     })
 
@@ -456,8 +466,8 @@ server <- function(input, output, session) {
         ggplot(respuestas_Sexo, aes(x=Sexo, y=value, fill = Sexo)) +
         geom_bar(stat="identity") + 
             xlab("Identidad") +
-            theme(axis.ticks.x = element_blank(),
-            axis.text.x = element_blank()) +
+            theme(axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
+            ylab("Frecuencia")+
             labs(fill = "")
         )
     })
@@ -472,6 +482,7 @@ server <- function(input, output, session) {
         ggplot(respuestas_Localidad, aes(x=Localidad, y=value, fill = Localidad)) +
         geom_bar(stat="identity") + 
             xlab("Localidades") +
+            ylab("Frecuencia")+
             coord_flip() +
             theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank()) +
@@ -489,6 +500,7 @@ server <- function(input, output, session) {
         ggplot(respuestas_Estado, aes(x=Estado, y=value, fill = Estado)) +
         geom_bar(stat="identity") + 
             xlab("Estados")+
+            ylab("Frecuencia")+
             coord_flip() +
             theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank()) +
@@ -506,6 +518,7 @@ server <- function(input, output, session) {
         ggplot(respuestas_Pais, aes(x=Pais, y=value, fill = Pais)) +
         geom_bar(stat="identity") + 
             xlab("Localidades")+
+            ylab("Frecuencia")+
             coord_flip() +
             theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank()) +
@@ -524,6 +537,7 @@ server <- function(input, output, session) {
         geom_bar(stat="identity") + 
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
+            ylab("Frecuencia")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
@@ -538,6 +552,7 @@ server <- function(input, output, session) {
         geom_bar(stat="identity") + 
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
+            ylab("Frecuencia")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
@@ -552,6 +567,7 @@ server <- function(input, output, session) {
         geom_bar(stat="identity") + 
             theme(axis.text.x = element_text(angle = 0, hjust=1)) +
             xlab("Respuesta")+
+            ylab("Frecuencia")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
@@ -915,8 +931,10 @@ output$misma_dir_agresor_victima <- renderPlotly({
         ggplotly(
         ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
         geom_bar(stat="identity") + 
-        theme(axis.text.x = element_text(angle = 0, hjust=1)) +
-        xlab("Instituciones")+
+        theme(axis.text.y = element_blank()) +
+        theme(legend.position = "bottom") +
+        theme(legend.title = element_blank()) +
+        xlab("") +
         ylab("Promedio de calificación")+
         coord_flip()
         )
@@ -931,8 +949,9 @@ output$misma_dir_agresor_victima <- renderPlotly({
         ggplotly(
         ggplot(respuestas_Util, aes(x=Util, y=value, fill = Util)) +
         geom_bar(stat="identity") + 
-            theme(axis.text.x = element_text(angle = 0, hjust=1)) +
+            theme(axis.text.x = element_text(angle = 0, hjust=1), legend.position="none") +
             xlab("Respuesta")+
+            ylab("Frecuencia")+
             scale_fill_manual(values=c('#56267d', '#2AB7CD')))
     })
 
