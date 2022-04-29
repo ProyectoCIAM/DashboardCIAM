@@ -39,7 +39,7 @@ body <- dashboardBody(
       fluidRow(
         box(
           title = "Medio de Contacto", width = 4, height="70vh", solidHeader = TRUE,
-          plotOutput("contacto")
+          plotlyOutput("contacto")
         ),
         box(
           title = "¿La persona que contacta es quien requiere el servicio?", width = 3, height="70vh", solidHeader = TRUE,
@@ -121,8 +121,8 @@ body <- dashboardBody(
      tabItem("demograficos", h2("Datos demográficos de la víctima"),
       fluidRow(
         box(
-          title = "Edades", width = 6, solidHeader = FALSE,
-          plotlyOutput("personasxEdad")
+          title = "Edades", width = 6, height = '300px', solidHeader = FALSE,
+          plotlyOutput("personasxEdad",height = '220px')
         ),
         box(
           title = "Tipos de servicio", width = 6, height = '300px', solidHeader = FALSE,
