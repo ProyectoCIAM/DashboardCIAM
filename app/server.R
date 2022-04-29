@@ -8,8 +8,8 @@ library(jsonlite)
 
 server <- function(input, output, session) { 
     # llamada tablas
-    # base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")
@@ -23,6 +23,7 @@ server <- function(input, output, session) {
     full_url_tipo_violencia <- base::paste0(base_url, "tipo_violencia")
     full_url_modalidad <- base::paste0(base_url, "modalidad")
     full_url_encuesta_satisfaccion <- base::paste0(base_url, "satisfaccion")
+    full_url_cantidad_sesiones <- base::paste0(base_url, "cantidad_sesiones")
 
     #retrieving json file
     folios_json <- jsonlite::fromJSON(full_url_folio)
@@ -36,6 +37,7 @@ server <- function(input, output, session) {
     tipo_violencia_json <- jsonlite::fromJSON(full_url_tipo_violencia)
     modalidad_json <- jsonlite::fromJSON(full_url_modalidad)
     encuesta_satisfaccion_json <- jsonlite::fromJSON(full_url_encuesta_satisfaccion)
+    cantidad_sesiones_json <- jsonlite::fromJSON(full_url_cantidad_sesiones)
 
 
     #retrieving api's response leaving the status out
@@ -49,7 +51,8 @@ server <- function(input, output, session) {
     sexos <- sexos_json$response
     tipo_violencia <- tipo_violencia_json$response
     modalidad <- modalidad_json$response
-    #encuesta_satisfaccion <- encuesta_satisfaccion_json$response
+    modalidad <- modalidad_json$response
+    cantidad_sesiones <- cantidad_sesiones_json$response
 
     #######################     Filtro de fechas ####################
     foliosF <- reactive({
@@ -613,7 +616,9 @@ server <- function(input, output, session) {
         filter(!is.na(rango_edades_agresor))
 
         rangos_edades_agresor <- edadesAgresor %>% group_by(rango_edades_agresor) %>% summarise(n = n())
-
+        # rangos_edades_agresor <- left_join(labels_rangos,rangos_edades_agresor, by="rango_edades")
+        # print(rango_edades_agresor)
+        # rangos_edades_agresor$n[is.na(rangos_edades_agresor$n)] <- 0
         ggplotly(
             ggplot(rangos_edades_agresor, aes(x = rango_edades_agresor, y = n, fill = rango_edades_agresor)) +
             geom_bar(stat = "identity") +
@@ -978,14 +983,20 @@ server <- function(input, output, session) {
         encuesta_satisfaccion <- encuesta_satisfaccionF()
 
         labels_rangos <- data.frame("rango_edades" = c("0 a 5","6 a 12","13 a 18","19 a 25","26 a 29","30 a 59","más de 60"))
+        encuesta_satisfaccion$edad <- as.numeric(encuesta_satisfaccion$edad)
+
         rango_edades <- cut(encuesta_satisfaccion$edad, breaks = c(-1,5,12,18,25,29,59,Inf), labels = labels_rangos$rango_edades)
         encuesta_satisfaccion$rango_edades <- rango_edades
 
-        enc_age <- encuesta_satisfaccion %>% group_by(id_cantidad_sesiones,rango_edades) %>%
-            mutate(n = n())
+        colnames(cantidad_sesiones)[2] <- "sesiones"
+
+        encuesta_satisfaccion <- merge(encuesta_satisfaccion, cantidad_sesiones, by="id_cantidad_sesiones")
+
+        enc_age <- encuesta_satisfaccion %>% group_by(id_cantidad_sesiones,rango_edades) %>% mutate(n = n())
+
         ggplotly(
-            ggplot(enc_age, aes(x = id_cantidad_sesiones, y = rango_edades)) +
-            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", id_cantidad_sesiones, rango_edades, n))) + 
+            ggplot(enc_age, aes(x = sesiones, fill = rango_edades)) +
+            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, rango_edades, n))) + 
             theme(legend.position = "none") +
             xlab("") +
             ylab("Cantidad") +
@@ -994,21 +1005,23 @@ server <- function(input, output, session) {
 
     output$sesionesxSexo <- renderPlotly({
         encuesta_satisfaccion <- encuesta_satisfaccionF()
-        print(length(colnames(encuesta_satisfaccion)))
 
-        colnames(encuesta_satisfaccion)[30] <- "id_sexo"
+        personas_copy <- personasF()[,c("id_folio","sexoPersona")]
+        encuesta_satisfaccion <- left_join(x = encuesta_satisfaccion, y = personas_copy, by = "id_folio") %>% group_by(id_folio) %>% slice(1)
+        colnames(encuesta_satisfaccion)[29] <- "id_sexo"
         colnames(sexos)[2] <- "sexoPersona"
         
         sexo <- sexos %>% group_by(id_sexo) %>% slice(1)
         encuenta_new_data <- merge(encuesta_satisfaccion, sexo, by="id_sexo")
-        encuenta_new_data <- merge(encuesta_satisfaccion, sexo, by="id_sexo")
+        colnames(cantidad_sesiones)[2] <- "sesiones"
 
+        encuenta_new_data <- merge(encuenta_new_data, cantidad_sesiones, by="id_cantidad_sesiones")
         enc_actual <- encuenta_new_data %>% group_by(id_cantidad_sesiones,sexoPersona) %>%
-            mutate(n = n())
+            mutate(n = n())        
 
         ggplotly(
-            ggplot(enc_actual, aes(x = id_cantidad_sesiones, fill = sexoPersona)) +
-            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", id_cantidad_sesiones, sexoPersona, n))) + 
+            ggplot(enc_actual, aes(x = sesiones, fill = sexoPersona)) +
+            geom_bar(position="dodge", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, sexoPersona, n))) + 
             theme(legend.position = "none") +
             xlab("") +
             ylab("Cantidad") +
@@ -1113,11 +1126,3 @@ server <- function(input, output, session) {
 
 
 }
-   
-
-
-
-
-
-
-
