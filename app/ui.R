@@ -6,7 +6,7 @@ header <- dashboardHeader(title = "Dashboard CIAM")
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    dateRangeInput('dateRange', label = 'Filtro por fechas: yyyy-mm-dd',
+    dateRangeInput('dateRange', label = 'Filtrar por fechas:',
       start = Sys.Date() - 365, end = Sys.Date()
     ),
     menuItem("Tablero de Canalización", icon = icon("dashboard"), startExpanded = TRUE, 
@@ -39,7 +39,7 @@ body <- dashboardBody(
       fluidRow(
         box(
           title = "Medio de Contacto", width = 6, solidHeader = TRUE,
-          plotOutput("contacto")
+          plotlyOutput("contacto")
         ),
         box(
           title = "¿La persona que contacta es quien requiere el servicio?", width = 6, solidHeader = TRUE,
@@ -116,7 +116,7 @@ body <- dashboardBody(
      tabItem("demograficos", h2("Datos demográficos de la víctima"),
       fluidRow(
         box(
-          title = "Personas Edades", width = 6, solidHeader = FALSE,
+          title = "Edades", width = 6, solidHeader = FALSE,
           plotlyOutput("personasxEdad")
         ),
         box(
