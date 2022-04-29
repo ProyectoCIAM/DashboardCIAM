@@ -251,6 +251,8 @@ body <- dashboardBody(
 
        box(title = "¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?", width = 6, solidHeader = TRUE,
        plotlyOutput("servicio_importante")),
+       box(title = "Oportuno y pronto vs. Importante", width = 6, solidHeader = TRUE,
+       plotlyOutput("importantexOportuno"))
      ),
     ),
      tabItem("atencion", h2("Calificaciones de atención brindada"),
