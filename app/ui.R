@@ -42,11 +42,11 @@ body <- dashboardBody(
           plotlyOutput("contacto")
         ),
         box(
-          title = "¿La persona que contacta es quien requiere el servicio?", width = 3, height="70vh", solidHeader = TRUE,
+          title = "¿La persona que contacta es quien requiere el servicio?", width = 2, height="70vh", solidHeader = TRUE,
           plotlyOutput("persona_servicio")
         ),
         box(
-          title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 5, height="70vh", solidHeader = TRUE,
+          title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 6, height="70vh", solidHeader = TRUE,
           plotlyOutput("serv_acomp_emocional")
         )
       ),
