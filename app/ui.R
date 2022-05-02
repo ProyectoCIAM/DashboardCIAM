@@ -9,6 +9,7 @@ sidebar <- dashboardSidebar(
     dateRangeInput('dateRange', label = 'Filtrar por fechas:',
       start = Sys.Date() - 365, end = Sys.Date()
     ),
+    menuItem("KPIs", icon = icon("dashboard"), tabName = "kpis"),
     menuItem("Tablero de Canalización", icon = icon("dashboard"), startExpanded = TRUE, 
       menuSubItem("Contacto", tabName = "contacto"),
       menuSubItem("Canalización anterior", tabName = "canalizacion"),
@@ -34,6 +35,12 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tabItems(
+    tabItem("kpis", h2("Indicadores clave de rendimiento"),
+      fluidRow(
+        infoBox("Logro en cambios esperados", uiOutput("kpi2"), icon = icon("users"), color = "purple"),
+        infoBox("Promedio de confianza y seguridad", uiOutput("kpi3"))
+      )
+    ),
     ############   TABS  DASHBOARD 1
     tabItem("contacto", h2("Medios de contacto"),  
       fluidRow(

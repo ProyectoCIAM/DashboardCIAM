@@ -75,6 +75,23 @@ server <- function(input, output, session) {
             filter(id_folio %in% foliosF()$id_folio)
     })
 
+    ####################### KPIS #############################
+    # kpi 2: si cambios * 100 / n de encuenstas
+    output$kpi2 <- renderUI({
+        sicambios <- encuesta_satisfaccionF() %>% filter(!is.na(sicambios)) %>% count(sicambios)
+        nencuestas <- nrow(encuesta_satisfaccionF())
+        porcentaje_de_cambio <- round(sicambios$n * 100 / nencuestas, 2)
+        paste0(porcentaje_de_cambio, "%")
+    })
+
+    # kpi 3: mean(confianzaSeguridad)
+    output$kpi3 <- renderText({
+        encuesta_satisfaccion <- encuesta_satisfaccionF()
+        promedio_confianzaSeguridad <- round(mean(as.integer(encuesta_satisfaccion$confianzaSeguridad)),2)
+        prettyNum(promedio_confianzaSeguridad)
+        #paste0(promedio_confianzaSeguridad, " / 5") 
+    })
+
     ########################        DASHBOARD 1  PART 1
     ###     MEDIO DE CONTACTO    ###
 
