@@ -18,6 +18,7 @@ sidebar <- dashboardSidebar(
     menuItem("Registro de Violencia", icon = icon("bar-chart-o"), startExpanded = TRUE,
       menuSubItem("Violencia experimentada", tabName = "violencia"),
       menuSubItem("Tipos de violencia actuales", tabName = "vactuales"),
+      menuSubItem("Violencia Anterior vs Actual", tabName = "thenvsnow"),
       menuSubItem("Datos demográficos", tabName = "demograficos"),
       menuSubItem("Datos del agresor", tabName = "agresor")),
     
@@ -37,8 +38,11 @@ body <- dashboardBody(
   tabItems(
     tabItem("kpis", h2("Indicadores clave de rendimiento"),
       fluidRow(
+        infoBox("Promedio de calificación a Instanicas (1 a 5)", uiOutput("kpi1")),
         infoBox("Logro en cambios esperados", uiOutput("kpi2"), icon = icon("users"), color = "purple"),
-        infoBox("Promedio de confianza y seguridad", uiOutput("kpi3"))
+        infoBox("Promedio de confianza y seguridad (1 a 5)", uiOutput("kpi3")),
+        infoBox("Promedio de respeto (1 a 5)", uiOutput("kpi4")),
+        infoBox("Promedio de satisfacción (1 a 5)", uiOutput("kpi5"))
       )
     ),
     ############   TABS  DASHBOARD 1
@@ -63,27 +67,27 @@ body <- dashboardBody(
         tabBox(
           width = 4,
           height="65vh",
-          tabPanel("Sección A", "¿Ha sido canalizada/o a otras instancias con anterioridad?", plotlyOutput("canalizacionxAnterior")),
+          tabPanel("Canalizado", "¿Ha sido canalizada/o a otras instancias con anterioridad?", plotlyOutput("canalizacionxAnterior")),
 
-          tabPanel("Sección B", "¿Ha tenido seguimiento?", plotlyOutput("canalizacionxSeguimiento"))
+          tabPanel("Seguimiento", "¿Ha tenido seguimiento?", plotlyOutput("canalizacionxSeguimiento"))
         ),
 
         tabBox(
           width = 4,
           height="65vh",
-          tabPanel("Sección C", "¿Considera que el medio de contacto fue el adecuado?", plotlyOutput("canalizacionxAdecuado")),
+          tabPanel("Medio adecuado", "¿Considera que el medio de contacto fue el adecuado?", plotlyOutput("canalizacionxAdecuado")),
 
-          tabPanel("Sección D", "¿Considera que el servicio fue oportuno (en el momento adecuado)?", plotlyOutput("canalizacionxOportuno")) 
+          tabPanel("Servicio oportuno", "¿Considera que el servicio fue oportuno (en el momento adecuado)?", plotlyOutput("canalizacionxOportuno")) 
         ),
 
         tabBox(
          width = 4,
          height="65vh",
-         tabPanel("Sección E", "¿Recibió atención con prontitud?", plotlyOutput("canalizacionxProntitud")),
+         tabPanel("Atención pronta", "¿Recibió atención con prontitud?", plotlyOutput("canalizacionxProntitud")),
 
-         tabPanel("Sección F", "¿Se sintió en confianza y seguro durante la atención?", plotlyOutput("canalizacionxConfianza")),
+         tabPanel("Confianza y seguridad", "¿Se sintió en confianza y seguro durante la atención?", plotlyOutput("canalizacionxConfianza")),
 
-         tabPanel("Sección G", "¿Sintió en todo momento que su caso fue tratado con respeto?", plotlyOutput("canalizacionxRespeto"))
+         tabPanel("Respeto", "¿Sintió en todo momento que su caso fue tratado con respeto?", plotlyOutput("canalizacionxRespeto"))
       ),
 
 
@@ -98,16 +102,16 @@ body <- dashboardBody(
      tabItem("violencia", h2("Tipos de violencia experimentada"),
       fluidRow(
         box(
-          title = "¿Qué tipos de violencia ha experimentado?", width = 6, solidHeader = TRUE,
-          plotlyOutput("hist_tipo_violencia_anterior")
+          title = "¿Qué tipos de violencia ha experimentado?", width = 6, height = "300px", solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_anterior", height = '220px', width = 'auto')
         ),
         box(
-          title = "Modalidad", width = 6, solidHeader = TRUE,
-          plotlyOutput("hist_modalidad_anterior")
+          title = "Modalidad", width = 6, height = "300px", solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_anterior", height = '220px', width = 'auto')
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 12, solidHeader = TRUE,
-          plotlyOutput("hist_tipo_vs_modalidad_anterior")
+          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 12, height = "400px", solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_anterior", height = '320px', width = 'auto')
         )
       )),
      tabItem("vactuales", h2("Tipos de violencia actuales"),
@@ -121,11 +125,22 @@ body <- dashboardBody(
           plotlyOutput("hist_modalidad_actual",height = '220px', width = 'auto')
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 6, height = "300px", solidHeader = TRUE,
-          plotlyOutput("hist_tipo_vs_modalidad_actual", height = '220px',)
+          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 12, height = "400px", solidHeader = TRUE,
+          plotlyOutput("hist_tipo_vs_modalidad_actual", height = '320px', width = 'auto')
         )
       )),
-     tabItem("demograficos", h2("Datos demográficos de la víctima"),
+    tabItem("thenvsnow", h2("Comparación de rankings en violencia anterior y violencia actual"),
+      fluidRow(
+        box(
+          title = "Tipo de violencia anterior vs. actual", width = 6, solidHeader = TRUE,
+          plotlyOutput("violencethenvsnow")
+        ),
+        box(
+          title = "Modalidad anterior vs. actual", width = 6, solidHeader = TRUE,
+          plotlyOutput("modalidadthenvsnow")
+        )
+    )),
+    tabItem("demograficos", h2("Datos demográficos de la víctima"),
       fluidRow(
         box(
           title = "Edades", width = 6, height = '300px', solidHeader = FALSE,
@@ -140,26 +155,26 @@ body <- dashboardBody(
           tabBox(
             width = 12,
             height = '400px',
-            tabPanel("Sección A", "¿Pertenece a la comunidad LGBTTTQA+?", plotlyOutput("personasxLGBT",height = '400px')),
+            tabPanel("LGBT", "¿Pertenece a la comunidad LGBTTTQA+?", plotlyOutput("personasxLGBT",height = '400px')),
 
-            tabPanel("Sección B", "Identidad sexogenerica", plotlyOutput("personasxSexo",height = '400px')),
+            tabPanel("Sexo", "Identidad sexogenerica", plotlyOutput("personasxSexo",height = '400px')),
 
-            tabPanel("Sección C", "¿Cuenta con alguna discapacidad?", plotlyOutput("personasxDiscapacidad",height = '400px')),
+            tabPanel("Discapacidad", "¿Cuenta con alguna discapacidad?", plotlyOutput("personasxDiscapacidad",height = '400px')),
 
-            tabPanel("Sección D", "¿Pertenece a pueblos originarios?", plotlyOutput("personasxPueblos",height = '400px')),
+            tabPanel("Pueblos", "¿Pertenece a pueblos originarios?", plotlyOutput("personasxPueblos",height = '400px')),
 
-            tabPanel("Sección E", "¿Habla alguna lengua indígena?", plotlyOutput("personasxLengua_Indigena",height = '400px'))
+            tabPanel("Lengua ingígena", "¿Habla alguna lengua indígena?", plotlyOutput("personasxLengua_Indigena",height = '400px'))
           ),
         ),
         box(
           title = "Residencias", width = 6, solidHeader = FALSE,
           tabBox(
             width = 12,
-            tabPanel("Localidad", "", plotlyOutput("personasxLocalidad")),
+            tabPanel("Localidad", "", dataTableOutput("personasxLocalidad")),
 
-            tabPanel("Estado", "", plotlyOutput("personasxEstado")),
+            tabPanel("Estado", "", dataTableOutput("personasxEstado")),
 
-            tabPanel("Pais", "", plotlyOutput("personasxPais"))
+            tabPanel("Pais", "", dataTableOutput("personasxPais"))
           ),
         )
       )
