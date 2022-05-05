@@ -129,7 +129,7 @@ body <- dashboardBody(
           plotlyOutput("hist_tipo_vs_modalidad_actual", height = '320px', width = 'auto')
         )
       )),
-    tabItem("thenvsnow", h2("Comparación de rankings en violencia anterior y violencia actual"),
+    tabItem("thenvsnow", h2("Modalidad y tipos de violencia anterior vs. actual"),
       fluidRow(
         box(
           title = "Tipo de violencia anterior vs. actual", width = 6, solidHeader = TRUE,

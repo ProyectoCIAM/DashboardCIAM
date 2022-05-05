@@ -4,12 +4,13 @@ library(ggplot2)
 library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
+library(ggsankey)
     
 
 server <- function(input, output, session) { 
     # llamada tablas
-    base_url <- "http://127.0.0.1:8000/api/" # url raiz
-    # base_url <- "http://127.0.0.1:8080/api/" # url raiz
+    #base_url <- "http://127.0.0.1:8000/api/" # url raiz
+    base_url <- "http://127.0.0.1:8080/api/" # url raiz
 
     # urls
     full_url_folio <- base::paste0(base_url, "folio")
@@ -130,7 +131,7 @@ server <- function(input, output, session) {
         foliosxmedioc <- right_join(count_contactos,medio_contacto)
         foliosxmedioc$n[is.na(foliosxmedioc$n)] <- 0
         ggplotly(
-            ggplot(foliosxmedioc, aes(x = medio_contacto, y = n, fill = medio_contacto)) +
+            ggplot(foliosxmedioc, aes(x = reorder(medio_contacto, -n), y = n, fill = factor(medio_contacto, level = medio_contacto))) +
                 geom_bar(stat="identity", color = "black", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", medio_contacto,n))) + 
         xlab("Categoría") +
         ylab("Frecuencia") +
@@ -398,6 +399,7 @@ server <- function(input, output, session) {
             geom_bar(stat = "identity", position = position_dodge(), color = "black", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
             ylab("Frecuencia") +
+            labs(fill = "Modalidad") +
             scale_fill_brewer(palette=3) +
             theme(axis.ticks.x = element_blank(), panel.background = element_blank()), tooltip = "text")
     })
@@ -462,6 +464,7 @@ server <- function(input, output, session) {
             geom_bar(stat = "identity", position = position_dodge(), color = "black", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
             ylab("Frecuencia") +
+            labs(fill = "Modalidad") +
             scale_fill_brewer(palette=3) +
             theme(axis.ticks.x = element_blank(), panel.background = element_blank()), tooltip = "text")
     })
@@ -473,32 +476,53 @@ server <- function(input, output, session) {
 
         colnames(tipo_violencia)[2] <- "tipo_violencia"
 
-        tipo_violencia_experimentada <- violencia_experimentada %>% count(id_tipo_violencia)
-        tipo_violencia_experimentada <- right_join(tipo_violencia_experimentada,tipo_violencia)
-        tipo_violencia_experimentada[is.na(tipo_violencia_experimentada)] <- 0
+        # tipo_violencia_experimentada <- violencia_experimentada %>% count(id_tipo_violencia)
+        # tipo_violencia_experimentada <- right_join(tipo_violencia_experimentada,tipo_violencia)
+        # tipo_violencia_experimentada[is.na(tipo_violencia_experimentada)] <- 0
 
         violencia_actual <- riesgosF()[,c("id_folio","violenciaRiesgo")]
         colnames(violencia_actual)[2] <- "id_tipo_violencia"
 
-        tipo_violencia_actual <- violencia_actual %>% count(id_tipo_violencia)
-        tipo_violencia_actual <- right_join(tipo_violencia_actual,tipo_violencia)
-        tipo_violencia_actual[is.na(tipo_violencia_actual)] <- 0
+        tipo_experimentada <- merge(tipo_violencia, violencia_experimentada)
+        tipo_experimentada <- tipo_experimentada %>% select(tipo_violencia, id_folio)
+        colnames(tipo_experimentada)[1] <- "Anterior"
 
-        violencia <- tipo_violencia_experimentada
-        violencia$Periodo <- 1
+        tipo_actual <- merge(tipo_violencia, violencia_actual)
+        tipo_actual <- tipo_actual %>% select(tipo_violencia, id_folio)
+        colnames(tipo_actual)[1] <- "Actual"
 
-        violencia_a <- tipo_violencia_actual
-        violencia_a$Periodo <- 2
+        tiposthennow <- merge(tipo_experimentada, tipo_actual, all=TRUE)
+        test_tipo <- tiposthennow %>% make_long(Anterior, Actual) 
 
-        violencias <- rbind(violencia,violencia_a)
-        violencias <- violencias %>% group_by(Periodo) %>% mutate(rank = row_number(desc(n)))
+        ggplotly(ggplot(test_tipo, aes(x = x, 
+                next_x = next_x, 
+                node = node, 
+                next_node = next_node,
+                fill = factor(node))) +
+            geom_sankey(aes(text=sprintf("Tipo violencia: %s", node))) +
+            theme_sankey(base_size = 16) +
+            labs(fill = "") +
+            xlab(""), tooltip = "text")
 
-        ggplotly(ggplot(violencias, aes(x = Periodo, y = -rank, color = tipo_violencia)) +
-            geom_line(size = 1.5) +
-            geom_point(size = 6) +
-            theme_void() +
-            theme(panel.background = element_blank()) +
-            labs(color = "Tipo de violencia"))
+        # tipo_violencia_actual <- violencia_actual %>% count(id_tipo_violencia)
+        # tipo_violencia_actual <- right_join(tipo_violencia_actual,tipo_violencia)
+        # tipo_violencia_actual[is.na(tipo_violencia_actual)] <- 0
+
+        # violencia <- tipo_violencia_experimentada
+        # violencia$Periodo <- 1
+
+        # violencia_a <- tipo_violencia_actual
+        # violencia_a$Periodo <- 2
+
+        # violencias <- rbind(violencia,violencia_a)
+        # violencias <- violencias %>% group_by(Periodo) %>% mutate(rank = row_number(desc(n)))
+
+        # ggplotly(ggplot(violencias, aes(x = Periodo, y = -rank, color = tipo_violencia)) +
+        #     geom_line(size = 1.5) +
+        #     geom_point(size = 6) +
+        #     theme_void() +
+        #     theme(panel.background = element_blank()) +
+        #     labs(color = "Tipo de violencia"))
     })
 
     output$modalidadthenvsnow <- renderPlotly({
@@ -506,34 +530,57 @@ server <- function(input, output, session) {
         colnames(violencia_experimentada)[2] <- "id_modalidad"
         colnames(modalidad)[2] <- "modalidad"
 
-        modalidad_experimentada <- violencia_experimentada %>% count(id_modalidad)
-        modalidad_experimentada <- right_join(modalidad_experimentada,modalidad)
-        modalidad_experimentada[is.na(modalidad_experimentada)] <- 0
+        # modalidad_experimentada <- violencia_experimentada %>% count(id_modalidad)
+        # modalidad_experimentada <- right_join(modalidad_experimentada,modalidad)
+        # modalidad_experimentada[is.na(modalidad_experimentada)] <- 0
 
         violencia_actual <- riesgosF()[,c("id_folio","modalidadRiesgo")]
         colnames(violencia_actual)[2] <- "id_modalidad"
 
-        modalidad_actual <- violencia_actual %>% count(id_modalidad)
-        modalidad_actual <- right_join(modalidad_actual,modalidad)
-        modalidad_actual[is.na(modalidad_actual)] <- 0
+        modalidad_experimentada <- merge(modalidad, violencia_experimentada)
+        modalidad_experimentada <- modalidad_experimentada %>% select(modalidad, id_folio)
+        colnames(modalidad_experimentada)[1] <- "Anterior"
 
-        modal <- modalidad_experimentada
-        modal$Periodo <- 1
+        modalidad_actual <- merge(modalidad, violencia_actual)
+        modalidad_actual <- modalidad_actual %>% select(modalidad, id_folio)
+        colnames(modalidad_actual)[1] <- "Actual"
 
-        modal_a <- modalidad_actual
-        modal_a$Periodo <- 2
+        modalidadesthennow <- merge(modalidad_experimentada, modalidad_actual, all=TRUE)
+        test <- modalidadesthennow %>% make_long(Anterior, Actual) 
 
-        #colnames(violencia)[2] <- "n_anterior"
-        modals <- rbind(modal,modal_a)
-        #colnames(violencia)[5] <- "n_actual"
-        modals <- modals %>% group_by(Periodo) %>% mutate(rank = row_number(desc(n)))
+        ggplotly(ggplot(test, aes(x = x, 
+                next_x = next_x, 
+                node = node, 
+                next_node = next_node,
+                fill = factor(node))) +
+            geom_sankey(aes(text=sprintf("Modalidad: %s", node))) +
+            theme_sankey(base_size = 16) +
+            labs(fill = "") +
+            xlab(""), tooltip = "text")
 
-        ggplotly(ggplot(modals, aes(x = Periodo, y = -rank, color = modalidad)) +
-        geom_line(size = 1.5) +
-        geom_point(size = 6) +
-        theme_void() +
-        theme(panel.background = element_blank()) +
-        labs(color = "Modalidad"))
+
+
+        # modalidad_actual <- violencia_actual %>% count(id_modalidad)
+        # modalidad_actual <- right_join(modalidad_actual,modalidad)
+        # modalidad_actual[is.na(modalidad_actual)] <- 0
+
+        # modal <- modalidad_experimentada
+        # modal$Periodo <- 1
+
+        # modal_a <- modalidad_actual
+        # modal_a$Periodo <- 2
+
+        # #colnames(violencia)[2] <- "n_anterior"
+        # modals <- rbind(modal,modal_a)
+        # #colnames(violencia)[5] <- "n_actual"
+        # modals <- modals %>% group_by(Periodo) %>% mutate(rank = row_number(desc(n)))
+
+        # ggplotly(ggplot(modals, aes(x = Periodo, y = -rank, color = modalidad)) +
+        # geom_line(size = 1.5) +
+        # geom_point(size = 6) +
+        # theme_void() +
+        # theme(panel.background = element_blank()) +
+        # labs(color = "Modalidad"))
     })
 
     ## SECTION C
@@ -1124,7 +1171,7 @@ server <- function(input, output, session) {
         edad_cs_count$n[is.na(edad_cs_count$n)] <- 0
 
         ggplotly(
-            ggplot(edad_cs_count, aes(x = sesiones, y = n, fill = rango_edades)) +
+            ggplot(edad_cs_count, aes(x = factor(rango_edades, level = labels_rangos$rango_edades), y = n, fill = sesiones)) +
             geom_bar(stat = "identity", position=position_dodge(), color = "black", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, rango_edades, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
@@ -1153,7 +1200,7 @@ server <- function(input, output, session) {
         sex_cs_count$n[is.na(sex_cs_count$n)] <- 0    
 
         ggplotly(
-            ggplot(sex_cs_count, aes(x = sesiones, y = n, fill = sexoPersona)) +
+            ggplot(sex_cs_count, aes(x = sexoPersona, y = n, fill = sesiones)) +
             geom_bar(stat = "identity", position=position_dodge(), color = "black", aes(text=sprintf("Cantidad de sesiones: %s<br>Sexo: %s<br>Cantidad: %s", sesiones, sexoPersona, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
@@ -1211,16 +1258,24 @@ server <- function(input, output, session) {
         encuesta_satisfaccion <- encuesta_satisfaccionF()
         encuesta_satisfaccion <- encuesta_satisfaccion %>% group_by(importante, oportunoPronto) %>%
             mutate(n = n())
+        imp <- data.frame("importante"=c("1","2","3","4","5"))
+        opoP <- data.frame("oportunoPronto"=c("1","2","3","4","5"))
+
+        impOpop <- merge(imp,opoP)
+
+        enc_s <- left_join(impOpop,encuesta_satisfaccion, by=c("importante","oportunoPronto"))
+        enc_s$n[is.na(enc_s$n)] <- 0
+        
+        cols <- RColorBrewer::brewer.pal(3,'Purples')[c(1,3)]
 
         ggplotly(
-            ggplot(encuesta_satisfaccion, aes(x = as.numeric(importante), y = as.numeric(oportunoPronto), colour = n)) +
-            geom_point(shape=21, size=6, aes(text=sprintf("Respuestas: %s",n))) +
-            xlim(1,5) +
-            ylim(1,5) +
+            ggplot(enc_s, aes(x = importante, y = oportunoPronto, fill = n)) +
+            geom_tile(aes(text=sprintf("Respuestas: %s",n))) +
             xlab("Importante") +
             ylab("Oportuno y Pronto") +
-            labs(colour = "Cantidad respuestas") +
-            theme(panel.background = element_blank()), tooltip = "text"
+            labs(fill = "Cantidad respuestas") +
+            theme(panel.background = element_blank()) +
+            scale_fill_gradient(low=cols[1],high=cols[2]), tooltip = "text"
         )
     })
 
