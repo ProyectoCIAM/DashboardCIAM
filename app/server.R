@@ -79,6 +79,7 @@ server <- function(input, output, session) {
     ########################### paleta de colores ###########################
 
     paleta <- rev(RColorBrewer::brewer.pal(8, "BuPu")[2:8])
+    paletaChica <- rev(RColorBrewer::brewer.pal(6, "BuPu")[2:6])
 
     ####################### KPIS #############################
     # kpi 1: mean(calificacionInstancia)
@@ -142,7 +143,7 @@ server <- function(input, output, session) {
         ylab("Frecuencia") +
         theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             labs(fill = ""), tooltip = "text"
         )
     })
@@ -645,7 +646,7 @@ server <- function(input, output, session) {
             ylab("Frecuencia") +
             theme(axis.ticks.x = element_blank(),
                 axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             labs(fill = ""), tooltip = "text")
     })
 
@@ -770,7 +771,7 @@ server <- function(input, output, session) {
             geom_bar(stat="identity", aes(text=sprintf("Tipo de servicio: %s<br>Frecuencia: %s", Tipo_Servicio, value))) + 
             ylab("Frecuencia") +
             xlab("Servicios") +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank(),
             panel.background = element_blank()) +
@@ -824,7 +825,7 @@ server <- function(input, output, session) {
             ylab("Frecuencia") +
             theme(axis.ticks.x = element_blank(),
                 axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             labs(fill = ""), tooltip = "text")
     })
 
@@ -1085,7 +1086,7 @@ server <- function(input, output, session) {
                 theme(axis.text.x = element_blank(), panel.background = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
-                scale_fill_manual(values = paleta) +
+                scale_fill_manual(values = paletaChica) +
                 labs(fill = "Instancia"), tooltip = "text")
     })
 
@@ -1211,7 +1212,7 @@ server <- function(input, output, session) {
             xlab("") +
             ylab("Cantidad") +
             labs(fill = "Sesiones") +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
 
@@ -1240,7 +1241,7 @@ server <- function(input, output, session) {
             xlab("") +
             ylab("Cantidad") +
             labs(fill = "Sesiones") +
-            scale_fill_manual(values = paleta) +
+            scale_fill_manual(values = paletaChica) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
     ##SECTION F
