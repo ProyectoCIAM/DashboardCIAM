@@ -16,9 +16,9 @@ sidebar <- dashboardSidebar(
       menuSubItem("Calificaciones instancias", tabName = "instancias")),
 
     menuItem("Registro de Violencia", icon = icon("bar-chart-o"), startExpanded = TRUE,
-      menuSubItem("Violencia experimentada", tabName = "violencia"),
-      menuSubItem("Tipos de violencia actuales", tabName = "vactuales"),
-      menuSubItem("Violencia Anterior vs Actual", tabName = "thenvsnow"),
+      menuSubItem("Violencia - Datos persona", tabName = "violencia"),
+      menuSubItem("Violencia - Riesgo", tabName = "vactuales"),
+      menuSubItem("Violencia - Persona vs Riesgo", tabName = "thenvsnow"),
       menuSubItem("Datos demográficos", tabName = "demograficos"),
       menuSubItem("Datos del agresor", tabName = "agresor")),
     
@@ -38,11 +38,11 @@ body <- dashboardBody(
   tabItems(
     tabItem("kpis", h2("Indicadores clave de rendimiento"),
       fluidRow(
-        infoBox("Promedio de calificación a Instanicas (1 a 5)", uiOutput("kpi1")),
+        infoBox("Promedio de calificación a Instanicias (1 a 5)", uiOutput("kpi1")),
         infoBox("Logro en cambios esperados", uiOutput("kpi2"), icon = icon("users"), color = "purple"),
         infoBox("Promedio de confianza y seguridad (1 a 5)", uiOutput("kpi3")),
         infoBox("Promedio de respeto (1 a 5)", uiOutput("kpi4")),
-        infoBox("Promedio de satisfacción (1 a 5)", uiOutput("kpi5"))
+        infoBox("Promedio de satisfacción trato del equipo (1 a 5)", uiOutput("kpi5"))
       )
     ),
     ############   TABS  DASHBOARD 1
@@ -99,44 +99,44 @@ body <- dashboardBody(
         "En general, ¿cómo calificaría la calidad de la atención recibida en esa instancia, del 1 al 10, siendo 1 una calificación muy mala y 10 muy buena?", plotlyOutput("calificacionesxinstancia")
         )),
     ############   TABS  DASHBOARD 2
-     tabItem("violencia", h2("Tipos de violencia experimentada"),
+     tabItem("violencia", h2("Violencia - Datos de la persona"),
       fluidRow(
         box(
           title = "¿Qué tipos de violencia ha experimentado?", width = 6, height = "300px", solidHeader = TRUE,
           plotlyOutput("hist_tipo_violencia_anterior", height = '220px', width = 'auto')
         ),
         box(
-          title = "Modalidad", width = 6, height = "300px", solidHeader = TRUE,
+          title = "Ámbito", width = 6, height = "300px", solidHeader = TRUE,
           plotlyOutput("hist_modalidad_anterior", height = '220px', width = 'auto')
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ANTERIORMENTE", width = 12, height = "400px", solidHeader = TRUE,
+          title = "Tipos de Violencia Experimentada VS. Ámbito - Datos de la persona", width = 12, height = "400px", solidHeader = TRUE,
           plotlyOutput("hist_tipo_vs_modalidad_anterior", height = '320px', width = 'auto')
         )
       )),
-     tabItem("vactuales", h2("Tipos de violencia actuales"),
+     tabItem("vactuales", h2("Violencia - Riesgo"),
       fluidRow(
         box(
           title = "¿Qué tipos de violencia experimenta actualmente?", width = 6, height = "300px", solidHeader = TRUE,
           plotlyOutput("hist_tipo_violencia_actual", height = '220px')
         ),
         box(
-          title = "Modalidad", width = 6, height = "300px", solidHeader = TRUE,
+          title = "Ámbito", width = 6, height = "300px", solidHeader = TRUE,
           plotlyOutput("hist_modalidad_actual",height = '220px', width = 'auto')
         ),
         box(
-          title = "Tipos de Violencia Experimentada VS. Modalidad ACTUAL", width = 12, height = "400px", solidHeader = TRUE,
+          title = "Tipos de Violencia Experimentada VS. Ámbito - Riesgo", width = 12, height = "400px", solidHeader = TRUE,
           plotlyOutput("hist_tipo_vs_modalidad_actual", height = '320px', width = 'auto')
         )
       )),
-    tabItem("thenvsnow", h2("Modalidad y tipos de violencia anterior vs. actual"),
+    tabItem("thenvsnow", h2("Modalidad y tipos de violencia - Datos de la persona vs. Riesgo"),
       fluidRow(
         box(
-          title = "Tipo de violencia anterior vs. actual", width = 6, solidHeader = TRUE,
+          title = "Tipo de violencia - Datos de la persona vs. Riesgo", width = 6, solidHeader = TRUE,
           plotlyOutput("violencethenvsnow")
         ),
         box(
-          title = "Modalidad anterior vs. actual", width = 6, solidHeader = TRUE,
+          title = "Ámbito - Datos de la persona vs. Riesgo", width = 6, solidHeader = TRUE,
           plotlyOutput("modalidadthenvsnow")
         )
     )),
@@ -260,12 +260,14 @@ body <- dashboardBody(
       )
      ),
     tabItem("sesiones", h2("Número de sesiones por edad y sexo"),
-    fluidRow(
-       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
-       plotlyOutput("sesionesxEdades")),
-       box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por identidad sexogenérica)", width = 6, solidHeader = TRUE,
-       plotlyOutput("sesionesxSexo"))
-     ),
+      fluidRow(
+        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
+        plotlyOutput("sesiones")),
+        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
+        plotlyOutput("sesionesxEdades")),
+        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por identidad sexogenérica)", width = 6, solidHeader = TRUE,
+        plotlyOutput("sesionesxSexo"))
+      ),
     ),
     tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
        box(title = "¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", width = 6, solidHeader = TRUE,

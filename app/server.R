@@ -76,6 +76,10 @@ server <- function(input, output, session) {
             filter(id_folio %in% foliosF()$id_folio)
     })
 
+    ########################### paleta de colores ###########################
+
+    paleta <- rev(RColorBrewer::brewer.pal(8, "BuPu")[2:8])
+
     ####################### KPIS #############################
     # kpi 1: mean(calificacionInstancia)
     output$kpi1 <- renderText({
@@ -130,14 +134,15 @@ server <- function(input, output, session) {
         # hacemos merge
         foliosxmedioc <- right_join(count_contactos,medio_contacto)
         foliosxmedioc$n[is.na(foliosxmedioc$n)] <- 0
+
         ggplotly(
             ggplot(foliosxmedioc, aes(x = reorder(medio_contacto, -n), y = n, fill = factor(medio_contacto, level = medio_contacto))) +
-                geom_bar(stat="identity", color = "black", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", medio_contacto,n))) + 
+                geom_bar(stat="identity", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", medio_contacto,n))) + 
         xlab("Categoría") +
         ylab("Frecuencia") +
         theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_brewer(palette=3) +
+            scale_fill_manual(values = paleta) +
             labs(fill = ""), tooltip = "text"
         )
     })
@@ -176,13 +181,13 @@ server <- function(input, output, session) {
         servicio_acomp_emocional_data$n[is.na(servicio_acomp_emocional_data$n)] <- 0
         
     ggplotly(
-        ggplot(servicio_acomp_emocional_data, aes(x=reorder(como_se_entero, -n), y=n, fill = como_se_entero)) + 
-        geom_bar(stat="identity", color = "black", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", como_se_entero,n))) + 
+        ggplot(servicio_acomp_emocional_data, aes(x=reorder(como_se_entero, -n), y=n, fill = factor(como_se_entero, level = como_se_entero_catalogo$como_se_entero))) + 
+        geom_bar(stat="identity", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", como_se_entero,n))) + 
         xlab("Categoría") +
         ylab("Frecuencia") +
         theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_brewer(palette=3) +
+            scale_fill_manual(values = paleta) +
             labs(fill = ""), tooltip = "text")
     })
 
@@ -325,12 +330,12 @@ server <- function(input, output, session) {
         
         # graficamos
         ggplotly(ggplot(todasInstanciasCalif, aes(x = reorder(Instancia,-Promedio), y = Promedio, fill = Instancia)) +
-            geom_bar(stat = "identity", color = "black", aes(text=sprintf("Instancia: %s<br>Promedio: %s<br>Conteo: %s<br>Calificación mínima: %s<br>Calificación máxima: %s", Instancia, Promedio, Conteo, Min, Max))) +
+            geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Promedio: %s<br>Conteo: %s<br>Calificación mínima: %s<br>Calificación máxima: %s", Instancia, Promedio, Conteo, Min, Max))) +
             theme(axis.title.x = element_blank(),
                 axis.text.x = element_blank(),
                 axis.ticks.x = element_blank(),
                 panel.background = element_blank()) +
-                scale_fill_brewer(palette=3), tooltip = "text")
+                scale_fill_manual(values = paleta), tooltip = "text")
     })
 
 
@@ -373,7 +378,7 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(modalidad_experimentada, aes(x = reorder(modalidad,-n) ,y = n)) +
-            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Ámbito: %s<br>Frecuencia: %s", modalidad, n))) +
             xlab("") +
             ylab("Frecuencia") +
             labs(fill = "") +
@@ -396,11 +401,11 @@ server <- function(input, output, session) {
         
         ggplotly(
             ggplot(tv_vs_m, aes(x = tipo_violencia, y = n, fill = modalidad)) +
-            geom_bar(stat = "identity", position = position_dodge(), color = "black", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            geom_bar(stat = "identity", position = position_dodge(), aes(text=sprintf("Tipo de violencia: %s<br>Ámbito: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
             ylab("Frecuencia") +
-            labs(fill = "Modalidad") +
-            scale_fill_brewer(palette=3) +
+            labs(fill = "Ámbito") +
+            scale_fill_manual(values = paleta) +
             theme(axis.ticks.x = element_blank(), panel.background = element_blank()), tooltip = "text")
     })
 
@@ -438,7 +443,7 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(modalidad_actual, aes(x = reorder(modalidad,-n) ,y = n)) +
-            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Modalidad: %s<br>Frecuencia: %s", modalidad, n))) +
+            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Ámbito: %s<br>Frecuencia: %s", modalidad, n))) +
             xlab("") +
             ylab("Frecuencia") +
             labs(fill = "") +
@@ -461,11 +466,11 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(tv_vs_m_actual, aes(x = tipo_violencia, y = n, fill = modalidad)) +
-            geom_bar(stat = "identity", position = position_dodge(), color = "black", aes(text=sprintf("Tipo de violencia: %s<br>Modalidad: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
+            geom_bar(stat = "identity", position = position_dodge(), aes(text=sprintf("Tipo de violencia: %s<br>Ámbito: %s<br>Frecuencia: %s", tipo_violencia, modalidad, n))) + 
             xlab("Tipos de Violencia") +
             ylab("Frecuencia") +
-            labs(fill = "Modalidad") +
-            scale_fill_brewer(palette=3) +
+            labs(fill = "Ámbito") +
+            scale_fill_manual(values = paleta) +
             theme(axis.ticks.x = element_blank(), panel.background = element_blank()), tooltip = "text")
     })
 
@@ -485,14 +490,14 @@ server <- function(input, output, session) {
 
         tipo_experimentada <- merge(tipo_violencia, violencia_experimentada)
         tipo_experimentada <- tipo_experimentada %>% select(tipo_violencia, id_folio)
-        colnames(tipo_experimentada)[1] <- "Anterior"
+        colnames(tipo_experimentada)[1] <- "Persona"
 
         tipo_actual <- merge(tipo_violencia, violencia_actual)
         tipo_actual <- tipo_actual %>% select(tipo_violencia, id_folio)
-        colnames(tipo_actual)[1] <- "Actual"
+        colnames(tipo_actual)[1] <- "Riesgo"
 
         tiposthennow <- merge(tipo_experimentada, tipo_actual, all=TRUE)
-        test_tipo <- tiposthennow %>% make_long(Anterior, Actual) 
+        test_tipo <- tiposthennow %>% make_long(Persona, Riesgo) 
 
         ggplotly(ggplot(test_tipo, aes(x = x, 
                 next_x = next_x, 
@@ -501,6 +506,7 @@ server <- function(input, output, session) {
                 fill = factor(node))) +
             geom_sankey(aes(text=sprintf("Tipo violencia: %s", node))) +
             theme_sankey(base_size = 16) +
+            scale_fill_manual(values = paleta) +
             labs(fill = "") +
             xlab(""), tooltip = "text")
 
@@ -539,22 +545,23 @@ server <- function(input, output, session) {
 
         modalidad_experimentada <- merge(modalidad, violencia_experimentada)
         modalidad_experimentada <- modalidad_experimentada %>% select(modalidad, id_folio)
-        colnames(modalidad_experimentada)[1] <- "Anterior"
+        colnames(modalidad_experimentada)[1] <- "Persona"
 
         modalidad_actual <- merge(modalidad, violencia_actual)
         modalidad_actual <- modalidad_actual %>% select(modalidad, id_folio)
-        colnames(modalidad_actual)[1] <- "Actual"
+        colnames(modalidad_actual)[1] <- "Riesgo"
 
         modalidadesthennow <- merge(modalidad_experimentada, modalidad_actual, all=TRUE)
-        test <- modalidadesthennow %>% make_long(Anterior, Actual) 
+        test <- modalidadesthennow %>% make_long(Persona, Riesgo) 
 
         ggplotly(ggplot(test, aes(x = x, 
                 next_x = next_x, 
                 node = node, 
                 next_node = next_node,
                 fill = factor(node))) +
-            geom_sankey(aes(text=sprintf("Modalidad: %s", node))) +
+            geom_sankey(aes(text=sprintf("Ámbito: %s", node))) +
             theme_sankey(base_size = 16) +
+            scale_fill_manual(values = paleta) +
             labs(fill = "") +
             xlab(""), tooltip = "text")
 
@@ -633,22 +640,23 @@ server <- function(input, output, session) {
 
         ggplotly(
         ggplot(respuestas_Sexo, aes(x=Sexo, y=value, fill=Sexo)) +
-            geom_bar(stat="identity", color = "black", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", Sexo,value))) + 
+            geom_bar(stat="identity", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", Sexo,value))) + 
             xlab("Categoría") +
             ylab("Frecuencia") +
             theme(axis.ticks.x = element_blank(),
                 axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_brewer(palette=3) +
+            scale_fill_manual(values = paleta) +
             labs(fill = ""), tooltip = "text")
     })
 
     output$personasxLocalidad <- renderDataTable({
         personas <- personasF()
-        countLoc <- personas %>% count(personas$localidadResidenciaPersona)
+        countLoc <- personas %>% count(localidadResidenciaPersona) %>%
+            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            arrange(desc(freq))
         colnames(countLoc)[1] <- "locations"
 
-        #respuestas_Localidad <- 
-        data.frame(Localidad = c(countLoc$locations), Conteo = c(countLoc$n))
+        data.frame(Localidad = c(countLoc$locations), Conteo = c(countLoc$n), Porcentaje = c(countLoc$freq))
 
         # ggplotly(
         # ggplot(respuestas_Localidad, aes(x=Localidad, y=Conteo)) +
@@ -662,11 +670,13 @@ server <- function(input, output, session) {
 
     output$personasxEstado <- renderDataTable({
         personas <- personasF()
-        countEst <- personas %>% count(personas$estadoResidenciaPersona)
+        countEst <- personas %>% count(personas$estadoResidenciaPersona) %>%
+            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            arrange(desc(freq))
         colnames(countEst)[1] <- "locations"
 
         #respuestas_Estado <- 
-        data.frame(Estado = c(countEst$locations), Conteo = c(countEst$n))
+        data.frame(Estado = c(countEst$locations), Conteo = c(countEst$n), Porcentaje = c(countEst$freq))
 
         # ggplotly(
         # ggplot(respuestas_Estado, aes(x=Estado, y=Conteo)) +
@@ -680,11 +690,13 @@ server <- function(input, output, session) {
 
     output$personasxPais <- renderDataTable({
         personas <- personasF()
-        countPais <- personas %>% count(personas$paisResidenciaPersona)
+        countPais <- personas %>% count(personas$paisResidenciaPersona) %>%
+            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            arrange(desc(freq))
         colnames(countPais)[1] <- "locations"
 
         #respuestas_Pais <- 
-        data.frame(Pais = c(countPais$locations), Conteo = c(countPais$n))
+        data.frame(Pais = c(countPais$locations), Conteo = c(countPais$n), Porcentaje = c(countPais$freq))
 
         # ggplotly(
         # ggplot(respuestas_Pais, aes(x=Pais, y=Conteo)) +
@@ -755,10 +767,10 @@ server <- function(input, output, session) {
         
         ggplotly(
             ggplot(respuestas_Tipo_Servicio, aes(x= reorder(Tipo_Servicio, -value), y=value, fill = Tipo_Servicio)) +
-            geom_bar(stat="identity", color = "black", aes(text=sprintf("Tipo de servicio: %s<br>Frecuencia: %s", Tipo_Servicio, value))) + 
+            geom_bar(stat="identity", aes(text=sprintf("Tipo de servicio: %s<br>Frecuencia: %s", Tipo_Servicio, value))) + 
             ylab("Frecuencia") +
             xlab("Servicios") +
-            scale_fill_brewer(palette=3) +
+            scale_fill_manual(values = paleta) +
             theme(axis.ticks.x = element_blank(),
             axis.text.x = element_blank(),
             panel.background = element_blank()) +
@@ -807,12 +819,12 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(sexos_agresor_data, aes(x = sexos_agresor_catalogo, y = n, fill = sexos_agresor_catalogo)) +
-            geom_bar(stat="identity", color = "black", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", sexos_agresor_catalogo,n))) + 
+            geom_bar(stat="identity", aes(text=sprintf("Categoría: %s<br>Frecuencia: %s", sexos_agresor_catalogo,n))) + 
             xlab("Categoría") +
             ylab("Frecuencia") +
             theme(axis.ticks.x = element_blank(),
                 axis.text.x = element_blank(), panel.background = element_blank()) +
-            scale_fill_brewer(palette=3) +
+            scale_fill_manual(values = paleta) +
             labs(fill = ""), tooltip = "text")
     })
 
@@ -1069,11 +1081,11 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(sexosPersonaS, aes(x = Sexo, y = n, fill = Sexo)) +
-                geom_bar(stat = "identity", color = "black", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",Sexo,n))) +
+                geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",Sexo,n))) +
                 theme(axis.text.x = element_blank(), panel.background = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
-                scale_fill_brewer(palette=3) +
+                scale_fill_manual(values = paleta) +
                 labs(fill = "Instancia"), tooltip = "text")
     })
 
@@ -1092,11 +1104,11 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(count_instancias, aes(x = reorder(nomInstancia,-n), y = n, fill = nomInstancia)) +
-                geom_bar(stat = "identity", color = "black", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",nomInstancia,n))) +
+                geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",nomInstancia,n))) +
                 theme(axis.text.x = element_blank(), panel.background = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
-                scale_fill_brewer(palette=3) +
+                scale_fill_manual(values = paleta) +
                 labs(fill = "Instancia"), tooltip = "text")
     })
 
@@ -1106,10 +1118,12 @@ server <- function(input, output, session) {
         encuesta_satisfaccion <- encuesta_satisfaccionF()
         colnames(instancia)[2] <- "institucion"
         colnames(encuesta_satisfaccion)[24] <- "id_instancia"
+
+        instancia <- instancia[!instancia$institucion == "CIAM",]
         
-        instancia_new <- instancia %>% group_by(id_instancia) %>% slice(1)
+        #instancia_new <- instancia %>% group_by(id_instancia) %>% slice(1)
         
-        satisfaccion_data <- merge(encuesta_satisfaccion, instancia_new, by="id_instancia")
+        satisfaccion_data <- merge(encuesta_satisfaccion, instancia, by="id_instancia")
         califxServicio <- satisfaccion_data %>% group_by(institucion) %>%
             summarize(promedio = round(mean(as.numeric(calificacionInstancia)), 2)) %>%
             arrange(desc(promedio)) %>%
@@ -1117,17 +1131,20 @@ server <- function(input, output, session) {
 
         colnames(califxServicio)[1] <- "institucion"
 
-        respuestas_Institucion <- data.frame(Institucion = c(califxServicio$institucion), value = c(califxServicio$promedio))
+        todasInstanciasCalif <- left_join(instancia,califxServicio)
+        todasInstanciasCalif$promedio[is.na(todasInstanciasCalif$promedio)] <- 0
+
+        respuestas_Institucion <- data.frame(Institucion = c(todasInstanciasCalif$institucion), value = c(todasInstanciasCalif$promedio))
 
         ggplotly(
-        ggplot(respuestas_Institucion, aes(x=Institucion, y=value, fill = Institucion)) +
-        geom_bar(stat = "identity", color = "black", aes(text=sprintf("Institucion: %s<br>Frecuencia: %s",Institucion,value))) +
+        ggplot(respuestas_Institucion, aes(x= reorder(Institucion, value), y=value, fill = Institucion)) +
+        geom_bar(stat = "identity", aes(text=sprintf("Institucion: %s<br>Frecuencia: %s",Institucion,value))) +
         theme(axis.text.y = element_blank()) +
         theme(legend.position = "bottom") +
         theme(legend.title = element_blank(), panel.background = element_blank()) +
         xlab("") +
         ylab("Promedio de calificación")+
-        scale_fill_brewer(palette=3) +
+        scale_fill_manual(values = paleta) +
         coord_flip(), tooltip = "text"
         )
     })
@@ -1149,6 +1166,23 @@ server <- function(input, output, session) {
     })
 
     ##SECTION E
+    output$sesiones <- renderPlotly({
+        encuesta_satisfaccion <- encuesta_satisfaccionF()
+        hist_sesiones <- encuesta_satisfaccion %>% count(id_cantidad_sesiones)
+        colnames(cantidad_sesiones)[2] <- "sesiones"
+        cantidad_sesiones$id_cantidad_sesiones <- as.character(cantidad_sesiones$id_cantidad_sesiones)
+        hist_sesiones <- left_join(cantidad_sesiones,hist_sesiones)
+        hist_sesiones$n[is.na(hist_sesiones$n)] <- 0
+
+        ggplotly(
+            ggplot(hist_sesiones, aes(x = sesiones, y = n)) +
+            geom_bar(stat = "identity", color = "#56267d", fill = "#56267d", width = 1, aes(text = sprintf("Cantidad sesiones: %s<br>Frecuencia: %s", sesiones, n))) +
+            xlab("Cantidad de sesiones") +
+            ylab("Frecuencia") +
+            theme(panel.background = element_blank()), tooltip = "text"
+        )
+    })
+
     output$sesionesxEdades <- renderPlotly({
         encuesta_satisfaccion <- encuesta_satisfaccionF()
 
@@ -1172,12 +1206,12 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(edad_cs_count, aes(x = factor(rango_edades, level = labels_rangos$rango_edades), y = n, fill = sesiones)) +
-            geom_bar(stat = "identity", position=position_dodge(), color = "black", aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, rango_edades, n))) + 
+            geom_bar(stat = "identity", position=position_dodge(), aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, rango_edades, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
             ylab("Cantidad") +
-            labs(fill = "Rango de Edad") +
-            scale_fill_brewer(palette=3) +
+            labs(fill = "Sesiones") +
+            scale_fill_manual(values = paleta) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
 
@@ -1201,12 +1235,12 @@ server <- function(input, output, session) {
 
         ggplotly(
             ggplot(sex_cs_count, aes(x = sexoPersona, y = n, fill = sesiones)) +
-            geom_bar(stat = "identity", position=position_dodge(), color = "black", aes(text=sprintf("Cantidad de sesiones: %s<br>Sexo: %s<br>Cantidad: %s", sesiones, sexoPersona, n))) + 
+            geom_bar(stat = "identity", position=position_dodge(), aes(text=sprintf("Cantidad de sesiones: %s<br>Sexo: %s<br>Cantidad: %s", sesiones, sexoPersona, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
             ylab("Cantidad") +
-            labs(fill = "Sexo") +
-            scale_fill_brewer(palette=3) +
+            labs(fill = "Sesiones") +
+            scale_fill_manual(values = paleta) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
     })
     ##SECTION F
