@@ -48,18 +48,23 @@ body <- dashboardBody(
     ############   TABS  DASHBOARD 1
     tabItem("contacto", h2("Medios de contacto"),  
       fluidRow(
-        box(
-          title = "Medio de Contacto", width = 4, height="70vh", solidHeader = TRUE,
-          plotlyOutput("contacto")
+        tabBox(
+          width = 8, height="70vh", 
+          tabPanel("Medio de Contacto", "", plotlyOutput("contacto")),
+          tabPanel("¿Cómo se enteró de los servicos de acompañamiento emocional?", "", plotlyOutput("serv_acomp_emocional"))
         ),
+        # box(
+        #   title = "Medio de Contacto", width = 4, height="70vh", solidHeader = TRUE,
+        #   plotlyOutput("contacto")
+        # ),
         box(
-          title = "¿La persona que contacta es quien requiere el servicio?", width = 2, height="70vh", solidHeader = TRUE,
+          title = "¿La persona que contacta es quien requiere el servicio?", width = 4, height="70vh", solidHeader = TRUE,
           plotlyOutput("persona_servicio")
-        ),
-        box(
-          title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 6, height="70vh", solidHeader = TRUE,
-          plotlyOutput("serv_acomp_emocional")
         )
+        # box(
+        #   title = "¿Cómo se enteró de los servicos de acompañamiento emocional?", width = 6, height="70vh", solidHeader = TRUE,
+        #   plotlyOutput("serv_acomp_emocional")
+        # )
       ),
     ),
     tabItem("canalizacion", h2("Canalización anterior a otra instancia"),
@@ -151,30 +156,33 @@ body <- dashboardBody(
           plotlyOutput("personasxServicio",height = '220px')
         ),
         box(
-          title = "Datos demográficos", width = 6, height = '550px', solidHeader = FALSE,
+          title = "Datos demográficos", width = 6, height = '380px', solidHeader = FALSE,
           tabBox(
             width = 12,
-            height = '400px',
-            tabPanel("LGBT", "¿Pertenece a la comunidad LGBTTTQA+?", plotlyOutput("personasxLGBT",height = '400px')),
+            height = '300px',
+            tabPanel("LGBT", "¿Pertenece a la comunidad LGBTTTQA+?", plotlyOutput("personasxLGBT",height = '220px')),
 
-            tabPanel("Sexo", "Identidad sexogenerica", plotlyOutput("personasxSexo",height = '400px')),
+            tabPanel("Sexo", "Identidad sexogenerica", plotlyOutput("personasxSexo",height = '220px')),
 
-            tabPanel("Discapacidad", "¿Cuenta con alguna discapacidad?", plotlyOutput("personasxDiscapacidad",height = '400px')),
+            tabPanel("Discapacidad", "¿Cuenta con alguna discapacidad?", plotlyOutput("personasxDiscapacidad",height = '220px')),
 
-            tabPanel("Pueblos", "¿Pertenece a pueblos originarios?", plotlyOutput("personasxPueblos",height = '400px')),
+            tabPanel("Pueblos", "¿Pertenece a pueblos originarios?", plotlyOutput("personasxPueblos",height = '220px')),
 
-            tabPanel("Lengua ingígena", "¿Habla alguna lengua indígena?", plotlyOutput("personasxLengua_Indigena",height = '400px'))
+            tabPanel("Lengua ingígena", "¿Habla alguna lengua indígena?", plotlyOutput("personasxLengua_Indigena",height = '220px'))
           ),
         ),
         box(
           title = "Residencias", width = 6, solidHeader = FALSE,
           tabBox(
             width = 12,
-            tabPanel("Localidad", "", dataTableOutput("personasxLocalidad")),
+            tabPanel("Localidad", "", tableOutput("personasxLocalidad"), downloadButton("downloadXLSXLocalidad", "Descargar xlsx"),
+            downloadButton("downloadImageLocalidad", "Descargar jpeg")),
 
-            tabPanel("Estado", "", dataTableOutput("personasxEstado")),
+            tabPanel("Estado", "", tableOutput("personasxEstado"), downloadButton("downloadXLSXEstado", "Descargar xlsx"),
+            downloadButton("downloadImageEstado", "Descargar jpeg")),
 
-            tabPanel("Pais", "", dataTableOutput("personasxPais"))
+            tabPanel("Pais", "", tableOutput("personasxPais"), downloadButton("downloadXLSXPais", "Descargar xlsx"),
+            downloadButton("downloadImagePais", "Descargar jpeg"))
           ),
         )
       )
@@ -233,24 +241,24 @@ body <- dashboardBody(
      ),
      tabItem("ucanalizacion", h2("Utilidad de la canalización"),
       fluidRow(
-        box(title = "¿Fue canalizada/o por parte de CIAM a alguna otra institución?", width = 6, height = "400px", header = TRUE, plotlyOutput("canalizado", height = "320px")),
-        tabBox(
-          width = 6, height = "400px", 
-          tabPanel("Edad", "Edades de canalizadas/os", plotlyOutput("edadesCanalizados", height = "320px")),
-          tabPanel("Sexo", "Identidad sexogenérica de canalizadas/os", plotlyOutput("sexoCanalizados", height = "320px"))
-        ),
-        box(title = "¿A cuál institución?", width = 12, header = TRUE, plotlyOutput("frecInstanciasCanalizadas"))
+        box(title = "¿Fue canalizada/o por parte de CIAM a alguna otra institución?", width = 4, height = "300px", header = TRUE, 
+          plotlyOutput("canalizado", height = "220px")),
+        box(title = "¿A cuál institución?", width = 8, height = "300px", header = TRUE, 
+          plotlyOutput("frecInstanciasCanalizadas", height = "220px")),
+        box(title = "Canalización por edad", width = 6, height = "300px", header = TRUE, 
+          plotlyOutput("edadesCanalizados", height = "220px")),
+        box(title = "Canalización por sexo", width = 6, height = "300px", header = TRUE, 
+          plotlyOutput("sexoCanalizados", height = "220px"))
+        # tabBox(
+        #   width = 6, height = "400px", 
+        #   tabPanel("Edad", "Edades de canalizadas/os", plotlyOutput("edadesCanalizados", height = "320px")),
+        #   tabPanel("Sexo", "Identidad sexogenérica de canalizadas/os", plotlyOutput("sexoCanalizados", height = "320px"))
+        # ),
       )),
      tabItem("sexterno", h2("Calificación del servicio externo"),
       fluidRow(
         box(
           title = "¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", width = 8, height = "500px", solidHeader = TRUE,
-          # tabBox(
-          #   width = 12,
-          #   tabPanel("¿Cómo califica el servicio que le dieron las autoridades en la instancia a la que fue canalizada/o?", "", plotlyOutput("satisfaccionxServicio")),
-
-          #   tabPanel("¿La información que se le brindó en CIAM para poder acudir a esa instancia le fue útil?", "", plotlyOutput("satisfaccionxUtil")),
-          # ),
           plotlyOutput("satisfaccionxServicio", height = "420px")
         ),
         box(
@@ -261,20 +269,32 @@ body <- dashboardBody(
      ),
     tabItem("sesiones", h2("Número de sesiones por edad y sexo"),
       fluidRow(
-        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
+        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 5, solidHeader = TRUE,
         plotlyOutput("sesiones")),
-        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
-        plotlyOutput("sesionesxEdades")),
-        box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por identidad sexogenérica)", width = 6, solidHeader = TRUE,
-        plotlyOutput("sesionesxSexo"))
+        tabBox(
+          width = 7,
+          tabPanel("Por rangos de edad", "", plotlyOutput("sesionesxEdades")),
+
+          tabPanel("Por identidad sexogenérica", "", plotlyOutput("sesionesxSexo")),
+        )
+        # box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por rangos de edad)", width = 6, solidHeader = TRUE,
+        # plotlyOutput("sesionesxEdades")),
+        # box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.? (Por identidad sexogenérica)", width = 6, solidHeader = TRUE,
+        # plotlyOutput("sesionesxSexo"))
       ),
     ),
     tabItem("soportuno", h2("Servicio oportuno e importante"),   fluidRow(
-       box(title = "¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", width = 6, solidHeader = TRUE,
-       plotlyOutput("si_servicio")),
+        tabBox(
+          width = 6,
+          tabPanel("¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", "", plotlyOutput("si_servicio")),
 
-       box(title = "¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?", width = 6, solidHeader = TRUE,
-       plotlyOutput("servicio_importante")),
+          tabPanel("¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?", "", plotlyOutput("servicio_importante")),
+        ),
+      #  box(title = "¿Recibió el servicio de Acompañamiento Emocional oportunamente (en el momento indicado) y de manera pronta?", width = 6, solidHeader = TRUE,
+      #  plotlyOutput("si_servicio")),
+
+      #  box(title = "¿Qué tan importante y necesario fue para usted recibir el Servicio de Acompañamiento Emocional?", width = 6, solidHeader = TRUE,
+      #  plotlyOutput("servicio_importante")),
        box(title = "Oportuno y pronto vs. Importante", width = 6, solidHeader = TRUE,
        plotlyOutput("importantexOportuno"))
      ),

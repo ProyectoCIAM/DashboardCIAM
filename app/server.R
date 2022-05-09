@@ -5,6 +5,8 @@ library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
 library(ggsankey)
+library(writexl)
+library(grid)
     
 
 server <- function(input, output, session) { 
@@ -650,64 +652,146 @@ server <- function(input, output, session) {
             labs(fill = ""), tooltip = "text")
     })
 
-    output$personasxLocalidad <- renderDataTable({
+    tableLocalidad <- reactive({
         personas <- personasF()
         countLoc <- personas %>% count(localidadResidenciaPersona) %>%
-            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            mutate(freq = paste((n / sum(n))*100, "%", sep="")) %>% 
             arrange(desc(freq))
         colnames(countLoc)[1] <- "locations"
 
         data.frame(Localidad = c(countLoc$locations), Conteo = c(countLoc$n), Porcentaje = c(countLoc$freq))
-
-        # ggplotly(
-        # ggplot(respuestas_Localidad, aes(x=Localidad, y=Conteo)) +
-        # geom_bar(stat = "identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Localidad: %s<br>Frecuencia: %s",Localidad,value))) +
-        #     xlab("") +
-        #     ylab("Frecuencia")+
-        #     coord_flip() +
-        #     theme(legend.position = "none", panel.background = element_blank()), tooltip = "text"
-        # )
     })
 
-    output$personasxEstado <- renderDataTable({
+    output$personasxLocalidad <- renderTable({
+        tableLocalidad()
+    })
+
+    output$downloadXLSXLocalidad <- downloadHandler(
+        filename = function() {
+            paste("localidad-", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableLocalidad()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageLocalidad <- reactive({
+        df <- tableLocalidad()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageLocalidad <- downloadHandler(
+        filename = function() {
+            paste("localidad-", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageLocalidad()
+            dev.off()
+        }
+    )
+
+    tableEstado <- reactive({
         personas <- personasF()
         countEst <- personas %>% count(personas$estadoResidenciaPersona) %>%
-            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            mutate(freq = paste((n / sum(n))*100, "%", sep="")) %>% 
             arrange(desc(freq))
         colnames(countEst)[1] <- "locations"
 
-        #respuestas_Estado <- 
         data.frame(Estado = c(countEst$locations), Conteo = c(countEst$n), Porcentaje = c(countEst$freq))
-
-        # ggplotly(
-        # ggplot(respuestas_Estado, aes(x=Estado, y=Conteo)) +
-        # geom_bar(stat = "identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Estado: %s<br>Frecuencia: %s",Estado,value))) +
-        #     xlab("") +
-        #     ylab("Frecuencia")+
-        #     coord_flip() +
-        #     theme(legend.position = "none", panel.background = element_blank()), tooltip = "text"
-        # )
     })
 
-    output$personasxPais <- renderDataTable({
+    output$personasxEstado <- renderTable({
+        tableEstado()
+    })
+
+    output$downloadXLSXEstado <- downloadHandler(
+        filename = function() {
+            paste("estado-", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableEstado()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageEstado <- reactive({
+        df <- tableEstado()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageEstado <- downloadHandler(
+        filename = function() {
+            paste("estado-", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageEstado()
+            dev.off()
+        }
+    )
+
+    tablePais <- reactive({
         personas <- personasF()
         countPais <- personas %>% count(personas$paisResidenciaPersona) %>%
-            mutate(freq = formattable::percent(n / sum(n))) %>% 
+            mutate(freq = paste((n / sum(n))*100, "%", sep="")) %>% 
             arrange(desc(freq))
         colnames(countPais)[1] <- "locations"
 
-        #respuestas_Pais <- 
         data.frame(Pais = c(countPais$locations), Conteo = c(countPais$n), Porcentaje = c(countPais$freq))
-
-        # ggplotly(
-        # ggplot(respuestas_Pais, aes(x=Pais, y=Conteo)) +
-        # geom_bar(stat = "identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Pais: %s<br>Frecuencia: %s",Pais,value))) +
-        #     xlab("") +
-        #     ylab("Frecuencia")+
-        #     coord_flip() +
-        #     theme(legend.position = "none", panel.background = element_blank()), tooltip = "text"
-        # )
     })
+
+    output$personasxPais <- renderTable({
+        tablePais()
+    })
+
+    output$downloadXLSXPais <- downloadHandler(
+        filename = function() {
+            paste("pais-", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tablePais()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imagePais <- reactive({
+        df <- tablePais()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImagePais <- downloadHandler(
+        filename = function() {
+            paste("pais-", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imagePais()
+            dev.off()
+        }
+    )
 
     output$personasxDiscapacidad <- renderPlotly({
         personas <- personasF()
@@ -1083,7 +1167,7 @@ server <- function(input, output, session) {
         ggplotly(
             ggplot(sexosPersonaS, aes(x = Sexo, y = n, fill = Sexo)) +
                 geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",Sexo,n))) +
-                theme(axis.text.x = element_blank(), panel.background = element_blank()) +
+                theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), panel.background = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
                 scale_fill_manual(values = paletaChica) +
@@ -1099,6 +1183,8 @@ server <- function(input, output, session) {
         count_intancias <- personasCanalizadas %>% group_by(institucion) %>% summarise(n = n())
         colnames(count_intancias)[1] <- "id_instancia"
 
+        instancia <- instancia[!instancia$nombre == "CIAM",]
+
         count_instancias <- right_join(count_intancias,instancia)
         count_instancias[is.na(count_instancias)] <- 0
         colnames(count_instancias)[3] <- "nomInstancia"
@@ -1106,7 +1192,7 @@ server <- function(input, output, session) {
         ggplotly(
             ggplot(count_instancias, aes(x = reorder(nomInstancia,-n), y = n, fill = nomInstancia)) +
                 geom_bar(stat = "identity", aes(text=sprintf("Instancia: %s<br>Frecuencia: %s",nomInstancia,n))) +
-                theme(axis.text.x = element_blank(), panel.background = element_blank()) +
+                theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), panel.background = element_blank()) +
                 xlab(element_blank()) +
                 ylab("Frecuencia") +
                 scale_fill_manual(values = paleta) +
@@ -1210,7 +1296,7 @@ server <- function(input, output, session) {
             geom_bar(stat = "identity", position=position_dodge(), aes(text=sprintf("Cantidad de sesiones: %s<br>Rango de Edad: %s<br>Cantidad: %s", sesiones, rango_edades, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
-            ylab("Cantidad") +
+            ylab("Frecuencia") +
             labs(fill = "Sesiones") +
             scale_fill_manual(values = paletaChica) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
@@ -1239,7 +1325,7 @@ server <- function(input, output, session) {
             geom_bar(stat = "identity", position=position_dodge(), aes(text=sprintf("Cantidad de sesiones: %s<br>Sexo: %s<br>Cantidad: %s", sesiones, sexoPersona, n))) + 
             theme(panel.background = element_blank()) +
             xlab("") +
-            ylab("Cantidad") +
+            ylab("Frecuencia") +
             labs(fill = "Sesiones") +
             scale_fill_manual(values = paletaChica) +
             theme(axis.ticks.x = element_blank()), tooltip = "text")
