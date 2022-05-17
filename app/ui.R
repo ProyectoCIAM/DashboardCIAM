@@ -272,7 +272,7 @@ body <- dashboardBody(
         box(title = "¿Cuántas sesiones de acompañamiento emocional recibió por parte de CIAM Cancún A.C.?", width = 5, solidHeader = TRUE,
         plotlyOutput("sesiones")),
         tabBox(
-          width = 7,
+          width = 12,
           tabPanel("Por rangos de edad", "", plotlyOutput("sesionesxEdades")),
 
           tabPanel("Por identidad sexogenérica", "", plotlyOutput("sesionesxSexo")),
