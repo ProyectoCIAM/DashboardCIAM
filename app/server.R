@@ -7,7 +7,9 @@ library(jsonlite)
 library(ggsankey)
 #library(writexl)
 library(grid)
+library(gridExtra)
 library(shadowtext)
+library(tidyr)
     
 
 server <- function(input, output, session) { 
@@ -386,23 +388,63 @@ server <- function(input, output, session) {
         colnames(violencia_experimentada)[3] <- "id_sexo"
         colnames(sexos)[2] <- "Sexo"
 
-        tipo_violencia_experimentada <- violencia_experimentada %>% group_by(id_tipo_violencia) %>%
-            mutate(n=n())
-        tipo_violencia_experimentada <- merge(tipo_violencia_experimentada,sexos)
+        tipo_violencia_experimentada <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_tipo_violencia)
         tipo_violencia_experimentada <- right_join(tipo_violencia_experimentada,tipo_violencia)
-        tipo_violencia_experimentada[is.na(tipo_violencia_experimentada)] <- 0
+        tipo_violencia_experimentada$n[is.na(tipo_violencia_experimentada$n)] <- 0
+
+        tipo_violencia_experimentadaxsex <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_tipo_violencia, id_sexo) #%>%
+            #mutate(n_sex=n())
+        tipo_violencia_sexos <- merge(tipo_violencia,sexos)
+        tipo_violencia_experimentadaxsex <- right_join(tipo_violencia_experimentadaxsex,tipo_violencia_sexos)
+        tipo_violencia_experimentadaxsex$n[is.na(tipo_violencia_experimentadaxsex$n)] <- 0
 
         tipo_violencia_experimentada$p <- paste0(round(tipo_violencia_experimentada$n * 100 / sum(tipo_violencia_experimentada$n),1), "%")
 
+        #tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+        #tbl <- tableGrob(tabla_resumen, rows=NULL, theme=tt)
+        #gr <- grid.arrange(g, tbl, nrow=2, as.table=TRUE)
+
         ggplotly(
-            ggplot(tipo_violencia_experimentada, aes(x = reorder(tipo_violencia,-n) ,y = n)) +
-            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
-            geom_line(aes(x = reorder(tipo_violencia,-n), y = n, fill = Sexo)) +
-            xlab("") +
-            ylab("Frecuencia") +
-            labs(fill = "") +
-            geom_text(aes(label = p), vjust = 1) +
-            theme(panel.background = element_blank()), tooltip = "text")
+            ggplot(data = tipo_violencia_experimentada, aes(x = tipo_violencia, y = n)) +
+                geom_bar(aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n)), stat="identity", color = '#56267d', fill = '#56267d') + 
+                xlab("") +
+                ylab("Frecuencia") +
+                #labs(fill = "") +
+                geom_text(aes(label = p), vjust = -1) +
+                geom_line(data = tipo_violencia_experimentadaxsex, aes(x = tipo_violencia, y = n, group = Sexo, colour = Sexo)) +
+                scale_color_manual(values = paleta[-1]) +
+                theme(panel.background = element_blank()), tooltip = "text")
+    })
+
+    tableTipoVDP <- reactive({
+        violencia_experimentada <- personasF()[,c("id_folio","tipoViolenciaPersona","sexoPersona")]
+        colnames(violencia_experimentada)[2] <- "id_tipo_violencia"
+        colnames(violencia_experimentada)[3] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+
+         tipo_violencia_experimentadaxsex <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_tipo_violencia, id_sexo) #%>%
+            #mutate(n_sex=n())
+        tipo_violencia_sexos <- merge(tipo_violencia,sexos)
+        tipo_violencia_experimentadaxsex <- right_join(tipo_violencia_experimentadaxsex,tipo_violencia_sexos)
+        tipo_violencia_experimentadaxsex$n[is.na(tipo_violencia_experimentadaxsex$n)] <- 0       
+
+        tabla_resumen <- tipo_violencia_experimentadaxsex[,c("Sexo","tipo_violencia","n")]
+        tabla_resumen <- pivot_wider(tabla_resumen, names_from = tipo_violencia, values_from = n)
+
+        samp2 <- tabla_resumen[,-1]
+        samp2 <- samp2[,order(names(samp2))]
+        
+        final <- cbind(samp2,tabla_resumen$Sexo)
+        colnames(final)[ncol(final)] <- "Sexo"
+
+        final
+    })
+
+    output$tablaTiposViolenciaDP <- renderTable({
+        tableTipoVDP()
     })
 
     # histograma de modalidad
@@ -423,7 +465,7 @@ server <- function(input, output, session) {
             xlab("") +
             ylab("Frecuencia") +
             labs(fill = "") +
-            geom_text(aes(label = p), vjust = 1) +
+            geom_text(aes(label = p), vjust = -1) +
             theme(panel.background = element_blank()), tooltip = "text")
     })
 

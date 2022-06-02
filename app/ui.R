@@ -107,8 +107,8 @@ body <- dashboardBody(
      tabItem("violencia", h2("Violencia - Datos de la persona"),
       fluidRow(
         box(
-          title = "¿Qué tipos de violencia ha experimentado?", width = 6, height = "300px", solidHeader = TRUE,
-          plotlyOutput("hist_tipo_violencia_anterior", height = '220px', width = 'auto')
+          title = "¿Qué tipos de violencia ha experimentado?", width = 6, solidHeader = TRUE,#height = "300px", 
+          plotlyOutput("hist_tipo_violencia_anterior", height = '250', width = 'auto'), tableOutput("tablaTiposViolenciaDP")
         ),
         box(
           title = "Ámbito", width = 6, height = "300px", solidHeader = TRUE,
