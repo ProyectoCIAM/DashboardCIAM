@@ -108,11 +108,13 @@ body <- dashboardBody(
       fluidRow(
         box(
           title = "¿Qué tipos de violencia ha experimentado?", width = 6, solidHeader = TRUE,#height = "300px", 
-          plotlyOutput("hist_tipo_violencia_anterior", height = '250', width = 'auto'), tableOutput("tablaTiposViolenciaDP")
+          plotlyOutput("hist_tipo_violencia_anterior", height = '250', width = 'auto'), tableOutput("tablaTiposViolenciaDP"),
+          downloadButton("downloadXLSXViolenciaDP", "Descargar xlsx"), downloadButton("downloadImageViolenciaDP", "Descargar jpeg")
         ),
         box(
-          title = "Ámbito", width = 6, height = "300px", solidHeader = TRUE,
-          plotlyOutput("hist_modalidad_anterior", height = '220px', width = 'auto')
+          title = "Ámbito", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_anterior", height = '250px', width = 'auto'), tableOutput("tablaModalidadDP"),
+          downloadButton("downloadXLSXModalidadDP", "Descargar xlsx"), downloadButton("downloadImageModalidadDP", "Descargar jpeg")
         ),
         box(
           title = "Tipos de Violencia Experimentada VS. Ámbito - Datos de la persona", width = 12, height = "400px", solidHeader = TRUE,
@@ -122,12 +124,14 @@ body <- dashboardBody(
      tabItem("vactuales", h2("Violencia - Riesgo"),
       fluidRow(
         box(
-          title = "¿Qué tipos de violencia experimenta actualmente?", width = 6, height = "300px", solidHeader = TRUE,
-          plotlyOutput("hist_tipo_violencia_actual", height = '220px')
+          title = "¿Qué tipos de violencia experimenta actualmente?", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_tipo_violencia_actual", height = '250px', width = 'auto'), tableOutput("tablaTiposViolenciaR"),
+          downloadButton("downloadXLSXViolenciaR", "Descargar xlsx"), downloadButton("downloadImageViolenciaR", "Descargar jpeg")
         ),
         box(
-          title = "Ámbito", width = 6, height = "300px", solidHeader = TRUE,
-          plotlyOutput("hist_modalidad_actual",height = '220px', width = 'auto')
+          title = "Ámbito", width = 6, solidHeader = TRUE,
+          plotlyOutput("hist_modalidad_actual",height = '250px', width = 'auto'), tableOutput("tablaModalidadR"),
+          downloadButton("downloadXLSXModalidadR", "Descargar xlsx"), downloadButton("downloadImageModalidadR", "Descargar jpeg")
         ),
         box(
           title = "Tipos de Violencia Experimentada VS. Ámbito - Riesgo", width = 12, height = "400px", solidHeader = TRUE,

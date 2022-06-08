@@ -5,7 +5,7 @@ library(hrbrthemes)
 #library(plotly)
 library(jsonlite)
 library(ggsankey)
-#library(writexl)
+library(writexl)
 library(grid)
 library(gridExtra)
 library(shadowtext)
@@ -394,24 +394,19 @@ server <- function(input, output, session) {
         tipo_violencia_experimentada$n[is.na(tipo_violencia_experimentada$n)] <- 0
 
         tipo_violencia_experimentadaxsex <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
-            count(id_tipo_violencia, id_sexo) #%>%
-            #mutate(n_sex=n())
+            count(id_tipo_violencia, id_sexo)
+            
         tipo_violencia_sexos <- merge(tipo_violencia,sexos)
         tipo_violencia_experimentadaxsex <- right_join(tipo_violencia_experimentadaxsex,tipo_violencia_sexos)
         tipo_violencia_experimentadaxsex$n[is.na(tipo_violencia_experimentadaxsex$n)] <- 0
 
         tipo_violencia_experimentada$p <- paste0(round(tipo_violencia_experimentada$n * 100 / sum(tipo_violencia_experimentada$n),1), "%")
 
-        #tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
-        #tbl <- tableGrob(tabla_resumen, rows=NULL, theme=tt)
-        #gr <- grid.arrange(g, tbl, nrow=2, as.table=TRUE)
-
         ggplotly(
             ggplot(data = tipo_violencia_experimentada, aes(x = tipo_violencia, y = n)) +
                 geom_bar(aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n)), stat="identity", color = '#56267d', fill = '#56267d') + 
                 xlab("") +
                 ylab("Frecuencia") +
-                #labs(fill = "") +
                 geom_text(aes(label = p), vjust = -1) +
                 geom_line(data = tipo_violencia_experimentadaxsex, aes(x = tipo_violencia, y = n, group = Sexo, colour = Sexo)) +
                 scale_color_manual(values = paleta[-1]) +
@@ -447,27 +442,133 @@ server <- function(input, output, session) {
         tableTipoVDP()
     })
 
+    output$downloadXLSXViolenciaDP <- downloadHandler(
+        filename = function() {
+            paste("Tipos de violencia Datos de la persona - ", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableTipoVDP()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageTipoVDP <- reactive({
+        df <- tableTipoVDP()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageViolenciaDP <- downloadHandler(
+        filename = function() {
+            paste("Tipos de violencia Datos de la persona - ", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageTipoVDP()
+            dev.off()
+        }
+    )
+
     # histograma de modalidad
     output$hist_modalidad_anterior <- renderPlotly({
-        violencia_experimentada <- personasF()[,c("id_folio","modalidadPersona")]
+        violencia_experimentada <- personasF()[,c("id_folio","modalidadPersona","sexoPersona")]
         colnames(violencia_experimentada)[2] <- "id_modalidad"
+        colnames(violencia_experimentada)[3] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
 
-        modalidad_experimentada <- violencia_experimentada %>% count(id_modalidad)
+        modalidad_experimentada <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_modalidad)
         modalidad_experimentada <- merge(modalidad_experimentada,modalidad)
         modalidad_experimentada <- right_join(modalidad_experimentada,modalidad)
         modalidad_experimentada[is.na(modalidad_experimentada)] <- 0
 
         modalidad_experimentada$p <- paste0(round(modalidad_experimentada$n * 100 / sum(modalidad_experimentada$n),1), "%")
 
+        modalidad_experimentadaxsex <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_modalidad, id_sexo)
+            
+        modalidad_sexos <- merge(modalidad,sexos)
+        modalidad_experimentadaxsex <- right_join(modalidad_experimentadaxsex,modalidad_sexos)
+        modalidad_experimentadaxsex$n[is.na(modalidad_experimentadaxsex$n)] <- 0
+
         ggplotly(
-            ggplot(modalidad_experimentada, aes(x = reorder(modalidad,-n) ,y = n)) +
-            geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Ámbito: %s<br>Frecuencia: %s", modalidad, n))) +
-            xlab("") +
-            ylab("Frecuencia") +
-            labs(fill = "") +
-            geom_text(aes(label = p), vjust = -1) +
-            theme(panel.background = element_blank()), tooltip = "text")
+            ggplot(modalidad_experimentada, aes(x = modalidad,y = n)) +
+                geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Ámbito: %s<br>Frecuencia: %s", modalidad, n))) +
+                xlab("") +
+                ylab("Frecuencia") +
+                geom_text(aes(label = p), vjust = -1) +
+                geom_line(data = modalidad_experimentadaxsex, aes(x = modalidad, y = n, group = Sexo, colour = Sexo)) +
+                scale_color_manual(values = paleta[-1]) +
+                theme(panel.background = element_blank()), tooltip = "text")
     })
+
+    tableModalidadDP <- reactive({
+        violencia_experimentada <- personasF()[,c("id_folio","modalidadPersona","sexoPersona")]
+        colnames(violencia_experimentada)[2] <- "id_modalidad"
+        colnames(violencia_experimentada)[3] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+
+        modalidad_experimentadaxsex <- violencia_experimentada %>% filter(!is.na(id_folio)) %>%
+            count(id_modalidad, id_sexo)
+            
+        modalidad_sexos <- merge(modalidad,sexos)
+        modalidad_experimentadaxsex <- right_join(modalidad_experimentadaxsex,modalidad_sexos)
+        modalidad_experimentadaxsex$n[is.na(modalidad_experimentadaxsex$n)] <- 0
+
+        tabla_resumen <- modalidad_experimentadaxsex[,c("Sexo","modalidad","n")]
+        tabla_resumen <- pivot_wider(tabla_resumen, names_from = modalidad, values_from = n)
+
+        samp2 <- tabla_resumen[,-1]
+        samp2 <- samp2[,order(names(samp2))]
+        
+        final <- cbind(samp2,tabla_resumen$Sexo)
+        colnames(final)[ncol(final)] <- "Sexo"
+
+        final
+    })
+
+    output$tablaModalidadDP <- renderTable({
+        tableModalidadDP()
+    })
+
+    output$downloadXLSXModalidadDP <- downloadHandler(
+        filename = function() {
+            paste("Modalidad Datos de la persona - ", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableModalidadDP()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageModalidadDP <- reactive({
+        df <- tableModalidadDP()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageModalidadDP <- downloadHandler(
+        filename = function() {
+            paste("Modalidad Datos de la persona - ", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageModalidadDP()
+            dev.off()
+        }
+    )
 
     # histograma combinado violencia vs modalidad
     output$hist_tipo_vs_modalidad_anterior <- renderPlotly({
@@ -504,6 +605,10 @@ server <- function(input, output, session) {
     output$hist_tipo_violencia_actual <- renderPlotly({
         violencia_actual <- riesgosF()[,c("id_folio","violenciaRiesgo")]
         colnames(violencia_actual)[2] <- "id_tipo_violencia"
+        sexo_personas <- personasF()[,c("id_folio","sexoPersona")]
+        colnames(sexo_personas)[2] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+        violencia_actual_sex <- merge(violencia_actual, sexo_personas)
 
         tipo_violencia_actual <- violencia_actual %>% count(id_tipo_violencia)
         tipo_violencia_actual <- merge(tipo_violencia_actual,tipo_violencia)
@@ -512,20 +617,96 @@ server <- function(input, output, session) {
 
         tipo_violencia_actual$p <- paste0(round(tipo_violencia_actual$n * 100 / sum(tipo_violencia_actual$n),1), "%")
 
+        tipo_violencia_actualxsex <- violencia_actual_sex %>% filter(!is.na(id_folio)) %>%
+            count(id_tipo_violencia, id_sexo)
+            
+        tipo_violencia_sexos <- merge(tipo_violencia,sexos)
+        tipo_violencia_actualxsex <- right_join(tipo_violencia_actualxsex,tipo_violencia_sexos)
+        tipo_violencia_actualxsex$n[is.na(tipo_violencia_actualxsex$n)] <- 0
+
         ggplotly(
-            ggplot(tipo_violencia_actual, aes(x = reorder(tipo_violencia,-n) ,y = n)) +
+            ggplot(tipo_violencia_actual, aes(x = tipo_violencia ,y = n)) +
             geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Tipo de violencia: %s<br>Frecuencia: %s", tipo_violencia, n))) + 
             xlab("") +
             ylab("Frecuencia") +
-            labs(fill = "") +
             geom_text(aes(label = p), vjust = 1) +
+            geom_line(data = tipo_violencia_actualxsex, aes(x = tipo_violencia, y = n, group = Sexo, colour = Sexo)) +
+            scale_color_manual(values = paleta[-1]) +
             theme(panel.background = element_blank()), tooltip = "text")
     })
+
+    tableTipoVR <- reactive({
+        violencia_actual <- riesgosF()[,c("id_folio","violenciaRiesgo")]
+        colnames(violencia_actual)[2] <- "id_tipo_violencia"
+        sexo_personas <- personasF()[,c("id_folio","sexoPersona")]
+        colnames(sexo_personas)[2] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+        violencia_actual_sex <- merge(violencia_actual, sexo_personas)
+
+        tipo_violencia_actualxsex <- violencia_actual_sex %>% filter(!is.na(id_folio)) %>%
+            count(id_tipo_violencia, id_sexo)
+            
+        tipo_violencia_sexos <- merge(tipo_violencia,sexos)
+        tipo_violencia_actualxsex <- right_join(tipo_violencia_actualxsex,tipo_violencia_sexos)
+        tipo_violencia_actualxsex$n[is.na(tipo_violencia_actualxsex$n)] <- 0       
+
+        tabla_resumen <- tipo_violencia_actualxsex[,c("Sexo","tipo_violencia","n")]
+        tabla_resumen <- pivot_wider(tabla_resumen, names_from = tipo_violencia, values_from = n)
+
+        samp2 <- tabla_resumen[,-1]
+        samp2 <- samp2[,order(names(samp2))]
+        
+        final <- cbind(samp2,tabla_resumen$Sexo)
+        colnames(final)[ncol(final)] <- "Sexo"
+
+        final
+    })
+
+    output$tablaTiposViolenciaR <- renderTable({
+        tableTipoVR()
+    })
+
+    output$downloadXLSXViolenciaR <- downloadHandler(
+        filename = function() {
+            paste("Tipos de violencia Riesgo - ", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableTipoVR()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageTipoVR <- reactive({
+        df <- tableTipoVR()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageViolenciaR <- downloadHandler(
+        filename = function() {
+            paste("Tipos de violencia Riesgo - ", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageTipoVR()
+            dev.off()
+        }
+    )
 
     # histograma de modalidad
     output$hist_modalidad_actual <- renderPlotly({
         violencia_actual <- riesgosF()[,c("id_folio","modalidadRiesgo")]
         colnames(violencia_actual)[2] <- "id_modalidad"
+        sexo_personas <- personasF()[,c("id_folio","sexoPersona")]
+        colnames(sexo_personas)[2] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+        violencia_actual_sex <- merge(violencia_actual, sexo_personas)
 
         modalidad_actual <- violencia_actual %>% count(id_modalidad)
         modalidad_actual <- merge(modalidad_actual,modalidad)
@@ -534,15 +715,87 @@ server <- function(input, output, session) {
 
         modalidad_actual$p <- paste0(round(modalidad_actual$n * 100 / sum(modalidad_actual$n),1), "%")
 
+        modalidad_actualxsex <- violencia_actual_sex %>% filter(!is.na(id_folio)) %>%
+            count(id_modalidad, id_sexo)
+            
+        modalidad_sexos <- merge(modalidad,sexos)
+        modalidad_actualxsex <- right_join(modalidad_actualxsex,modalidad_sexos)
+        modalidad_actualxsex$n[is.na(modalidad_actualxsex$n)] <- 0
+
         ggplotly(
-            ggplot(modalidad_actual, aes(x = reorder(modalidad,-n) ,y = n)) +
+            ggplot(modalidad_actual, aes(x = modalidad ,y = n)) +
             geom_bar(stat="identity", color = '#56267d', fill = '#56267d', aes(text=sprintf("Ámbito: %s<br>Frecuencia: %s", modalidad, n))) +
             xlab("") +
             ylab("Frecuencia") +
-            labs(fill = "") +
             geom_text(aes(label = p), vjust = 1) +
+            geom_line(data = modalidad_actualxsex, aes(x = modalidad, y = n, group = Sexo, colour = Sexo)) +
+            scale_color_manual(values = paleta[-1]) +
             theme(panel.background = element_blank()), tooltip = "text")
     })
+
+    tableModalidadR <- reactive({
+        violencia_actual <- riesgosF()[,c("id_folio","modalidadRiesgo")]
+        colnames(violencia_actual)[2] <- "id_modalidad"
+        sexo_personas <- personasF()[,c("id_folio","sexoPersona")]
+        colnames(sexo_personas)[2] <- "id_sexo"
+        colnames(sexos)[2] <- "Sexo"
+        violencia_actual_sex <- merge(violencia_actual, sexo_personas)
+
+        modalidad_actualxsex <- violencia_actual_sex %>% filter(!is.na(id_folio)) %>%
+            count(id_modalidad, id_sexo)
+            
+        modalidad_sexos <- merge(modalidad,sexos)
+        modalidad_actualxsex <- right_join(modalidad_actualxsex,modalidad_sexos)
+        modalidad_actualxsex$n[is.na(modalidad_actualxsex$n)] <- 0
+
+        tabla_resumen <- modalidad_actualxsex[,c("Sexo","modalidad","n")]
+        tabla_resumen <- pivot_wider(tabla_resumen, names_from = modalidad, values_from = n)
+
+        samp2 <- tabla_resumen[,-1]
+        samp2 <- samp2[,order(names(samp2))]
+        
+        final <- cbind(samp2,tabla_resumen$Sexo)
+        colnames(final)[ncol(final)] <- "Sexo"
+
+        final
+    })
+
+    output$tablaModalidadR <- renderTable({
+        tableModalidadR()
+    })
+
+    output$downloadXLSXModalidadR <- downloadHandler(
+        filename = function() {
+            paste("Modalidad Riesgo - ", Sys.Date(), ".xlsx", sep="")
+        },
+        content = function(file) {
+            data <- tableModalidadR()
+            write_xlsx(data, path = file)
+        }
+    )
+
+    imageModalidadR <- reactive({
+        df <- tableModalidadR()
+        myTable <- tableGrob(
+            df, 
+            rows = NULL, 
+            theme = ttheme_default(core = list(bg_params = list(fill = "grey99")))
+        )
+        img <- grid.draw(myTable)
+        img
+    })
+
+    output$downloadImageModalidadR <- downloadHandler(
+        filename = function() {
+            paste("Modalidad Riesgo - ", Sys.Date(), ".jpeg", sep="")
+        },
+        contentType = "image/jpeg",
+        content = function(file) {
+            png(file)
+            imageModalidadR()
+            dev.off()
+        }
+    )
 
     # histograma combinado violencia vs modalidad
     output$hist_tipo_vs_modalidad_actual <- renderPlotly({
